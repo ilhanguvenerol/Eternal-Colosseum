@@ -25,15 +25,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float groundedGravity = -2f;  // small constant to keep grounded
 
-    [Header("Camera")]
-    [SerializeField] private Transform cameraTransform;    // assign your Camera or CameraRoot
-
     // ─────────────────────────────────────────
     //  Private State
     // ─────────────────────────────────────────
 
     private CharacterController _controller;
     private PlayerInputActions _input;          // generated C# class from Input Actions asset
+    private Camera _mainCamera;
 
     // Input values
     private Vector2 _moveInput;
@@ -55,7 +53,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
-
+        _mainCamera = Camera.main;
         _input = new PlayerInputActions();
 
         // Move (Vector2 read every frame in Update)
@@ -99,9 +97,8 @@ public class PlayerMovement : MonoBehaviour
         Vector3 inputDir = Vector3.zero;
         if (_moveInput.sqrMagnitude > 0.01f)
         {
-            // Camera-relative movement: forward/right projected onto XZ plane
-            Vector3 camForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
-            Vector3 camRight = Vector3.ProjectOnPlane(cameraTransform.right, Vector3.up).normalized;
+            Vector3 camForward = Vector3.ProjectOnPlane(_mainCamera.transform.forward, Vector3.up).normalized;
+            Vector3 camRight = Vector3.ProjectOnPlane(_mainCamera.transform.right, Vector3.up).normalized;
             inputDir = (camForward * _moveInput.y + camRight * _moveInput.x).normalized;
         }
 
