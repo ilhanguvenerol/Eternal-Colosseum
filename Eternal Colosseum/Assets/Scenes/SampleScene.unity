@@ -664,9 +664,9 @@ GameObject:
   - component: {fileID: 1169081793}
   - component: {fileID: 1169081792}
   - component: {fileID: 1169081791}
-  - component: {fileID: 1169081790}
   - component: {fileID: 1169081789}
   - component: {fileID: 1169081794}
+  - component: {fileID: 1169081795}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Player
@@ -699,27 +699,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1169081790
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1169081788}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43e3f3dc6b2659b41bfe3d08b5aca162, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  walkSpeed: 3.5
-  runSpeed: 7
-  dashSpeed: 18
-  dashDuration: 0.2
-  acceleration: 12
-  deceleration: 16
-  rotationSpeed: 10
-  gravity: -20
-  groundedGravity: -2
 --- !u!23 &1169081791
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -822,6 +801,27 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 330585545}
+--- !u!114 &1169081795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1169081788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00ec0db348511494c8b7bda277c0498f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  WalkSpeed: 3.5
+  RunSpeed: 7
+  DashSpeed: 18
+  DashDuration: 0.2
+  Acceleration: 12
+  Deceleration: 16
+  RotationSpeed: 10
+  Gravity: -20
+  GroundedGravity: -2
 --- !u!1 &2055236175
 GameObject:
   m_ObjectHideFlags: 0
