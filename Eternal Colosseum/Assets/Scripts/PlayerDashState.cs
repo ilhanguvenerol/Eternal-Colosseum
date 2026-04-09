@@ -29,11 +29,11 @@ public class PlayerDashState : PlayerBaseState
         // Drive velocity at full dash speed — no acceleration needed
         Player.CurrentVelocity = _dashDirection * Player.DashSpeed;
 
-        // Dash finished → return to idle or walk based on input
+        // Dash finished → return to idle or walk based on input. Just return to idle and let the idle state handle the walk transition, otherwise triggers may reverse and walk animation may stuck in a loop.
         if (_dashTimer <= 0f)
         {
             Player.ChangeState(
-                Player.MoveInput.sqrMagnitude > 0.01f ? Player.WalkState : Player.IdleState
+                Player.IdleState
             );
         }
     }
