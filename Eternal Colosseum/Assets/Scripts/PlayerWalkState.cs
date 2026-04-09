@@ -8,7 +8,7 @@ public class PlayerWalkState : PlayerBaseState
 
     public override void Enter()
     {
-        // TODO: Animator trigger "Walk"
+        Player.PlayerAnimator.SetTrigger("walk trigger");
     }
 
     public override void Tick()

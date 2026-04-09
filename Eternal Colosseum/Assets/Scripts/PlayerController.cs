@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
 
     public CharacterController Controller { get; private set; }
     public Camera MainCamera { get; private set; }
+    public Animator PlayerAnimator;
 
     // ─────────────────────────────────────────
     //  State Machine

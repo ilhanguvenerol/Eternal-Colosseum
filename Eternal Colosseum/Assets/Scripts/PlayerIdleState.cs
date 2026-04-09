@@ -9,6 +9,8 @@ public class PlayerIdleState : PlayerBaseState
         // Bleed velocity to zero when we arrive in Idle
         Player.CurrentVelocity = Vector3.zero;
         // TODO: Animator trigger "Idle"
+        //if(!Player.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Armature|Idle_Loop"))
+            Player.PlayerAnimator.SetTrigger("idle trigger");
     }
 
     public override void Tick()
