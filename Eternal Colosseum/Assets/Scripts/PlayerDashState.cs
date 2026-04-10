@@ -19,6 +19,8 @@ public class PlayerDashState : PlayerBaseState
             : Player.transform.forward;
 
         // TODO: Animator trigger "Dash"
+        Player.Animator.SetState(PlayerAnimator.DASH);
+        //if dash is a short anim use PlayImmediate("DASH")
         // TODO: Spawn dash VFX / trail here
     }
 
@@ -33,7 +35,7 @@ public class PlayerDashState : PlayerBaseState
         if (_dashTimer <= 0f)
         {
             Player.ChangeState(
-                Player.IdleState
+                Player.MoveInput.sqrMagnitude > 0.01f ? Player.WalkState : Player.IdleState
             );
         }
     }

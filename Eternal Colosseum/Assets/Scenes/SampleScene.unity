@@ -465,14 +465,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   WalkSpeed: 3.5
   RunSpeed: 7
-  DashSpeed: 18
-  DashDuration: 0.2
+  DashSpeed: 4
+  DashDuration: 1
   Acceleration: 12
   Deceleration: 16
   RotationSpeed: 10
   Gravity: -20
   GroundedGravity: -2
-  PlayerAnimator: {fileID: 813185981}
 --- !u!143 &813185978
 CharacterController:
   m_ObjectHideFlags: 0
@@ -503,11 +502,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e3bba71128477e740bbf2215de338565, type: 3}
   m_PrefabInstance: {fileID: 1468115941}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &813185981 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: e3bba71128477e740bbf2215de338565, type: 3}
-  m_PrefabInstance: {fileID: 1468115941}
+--- !u!114 &813185982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813185975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25d82c688155c7a4b8e939d8a4c0c32a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,6 +824,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
       insertIndex: -1
       addedObject: {fileID: 813185976}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 813185982}
   m_SourcePrefab: {fileID: 100100000, guid: e3bba71128477e740bbf2215de338565, type: 3}
 --- !u!1 &2055236175
 GameObject:

@@ -9,6 +9,7 @@ public class PlayerRunState : PlayerBaseState
     public override void Enter()
     {
         // TODO: Animator trigger "Run"
+        Player.Animator.SetState(PlayerAnimator.RUN);
     }
 
     public override void Tick()
