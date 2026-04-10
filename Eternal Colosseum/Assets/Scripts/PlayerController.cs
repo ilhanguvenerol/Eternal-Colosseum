@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
 
     public CharacterController Controller { get; private set; }
     public Camera MainCamera { get; private set; }
-    public Animator PlayerAnimator;
+    public PlayerAnimator Animator { get; private set; }
 
     // ─────────────────────────────────────────
     //  State Machine
@@ -73,6 +73,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         Controller = GetComponent<CharacterController>();
+        Animator = GetComponent<PlayerAnimator>();
         MainCamera = Camera.main;
 
         // Build input
