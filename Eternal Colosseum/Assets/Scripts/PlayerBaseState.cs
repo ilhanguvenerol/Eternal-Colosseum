@@ -2,10 +2,11 @@
 // All player states inherit from this.
 // Gives every state access to the PlayerController without repeating the reference.
 
+using UnityEngine;
+
 public abstract class PlayerBaseState : IState
 {
     protected PlayerController Player;  // the MonoBehaviour that owns the state machine
-
     protected PlayerBaseState(PlayerController player)
     {
         Player = player;

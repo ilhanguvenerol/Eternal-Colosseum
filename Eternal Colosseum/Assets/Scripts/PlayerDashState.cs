@@ -19,6 +19,8 @@ public class PlayerDashState : PlayerBaseState
             : Player.transform.forward;
 
         // TODO: Animator trigger "Dash"
+        Player.Animator.SetState(PlayerAnimator.DASH);
+        //if dash is a short anim use PlayImmediate("DASH")
         // TODO: Spawn dash VFX / trail here
     }
 
@@ -29,7 +31,7 @@ public class PlayerDashState : PlayerBaseState
         // Drive velocity at full dash speed — no acceleration needed
         Player.CurrentVelocity = _dashDirection * Player.DashSpeed;
 
-        // Dash finished → return to idle or walk based on input
+        // Dash finished → return to idle or walk based on input. Just return to idle and let the idle state handle the walk transition, otherwise triggers may reverse and walk animation may stuck in a loop.
         if (_dashTimer <= 0f)
         {
             Player.ChangeState(
