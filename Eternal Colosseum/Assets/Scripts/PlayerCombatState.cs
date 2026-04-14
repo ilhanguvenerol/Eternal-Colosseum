@@ -1,0 +1,80 @@
+﻿// PlayerCombatState.cs
+
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerCombatState : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] private PlayerController _player;
+
+    [Header("Starting Spell (optional)")]
+    [SerializeField] private SpellData _startingSpell;
+
+    private PlayerInputActions _input;
+    private SpellData _equippedSpell;
+
+    private void Awake()
+    {
+        _input = new PlayerInputActions();
+
+        _input.Player.SwordAttack.performed += _ => TrySwordAttack();
+        _input.Player.Parry.performed += _ => TryParry();
+        _input.Player.Spell.performed += _ => TryCastSpell();    // single Spell action now
+        _input.Player.Spell.canceled += _ => TryExitSpell();
+    }
+
+    private void Start()
+    {
+        if (_startingSpell != null)
+            EquipSpell(_startingSpell);
+    }
+
+    private void OnEnable() => _input.Enable();
+    private void OnDisable() => _input.Disable();
+
+    // ── Public API (call from inventory system later) ─────────────────────────
+
+    /// <summary>
+    /// Equip a new spell. Safe to call anytime outside of combat.
+    /// The inventory system will call this when the player swaps spells.
+    /// </summary>
+    public void EquipSpell(SpellData spell)
+    {
+        _equippedSpell = spell;
+        _player.Animator.EquipSpell(spell);   // swaps the animation clip
+    }
+
+    public SpellData EquippedSpell => _equippedSpell;
+
+    // ── Combat Actions ────────────────────────────────────────────────────────
+
+    private void TrySwordAttack()
+    {
+        if (_player.Animator.IsCombatLocked) return;
+        _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
+    }
+
+    private void TryParry()
+    {
+        if (_player.Animator.IsCombatLocked) return;
+        _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_PARRY);
+    }
+
+    private void TryCastSpell()
+    {
+        if (_player.Animator.IsCombatLocked) return;
+        if (_equippedSpell == null)
+        {
+            Debug.Log("[PlayerCombatState] No spell equipped.");
+            return;
+        }
+
+        _player.Animator.PlaySpell();
+    }
+
+    private void TryExitSpell()
+    {
+        _player.Animator.ExitCombat();
+    }
+}
