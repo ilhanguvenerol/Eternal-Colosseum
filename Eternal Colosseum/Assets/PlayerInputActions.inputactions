@@ -32,33 +32,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "SwordAttack",
-                    "type": "Button",
-                    "id": "23af45ad-247e-44c6-85e6-7cb87986cbb1",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Parry",
-                    "type": "Button",
-                    "id": "8a4ee263-3b8e-42c9-b514-7609604ac8b3",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Spell",
-                    "type": "Button",
-                    "id": "1df170be-e453-4ed6-8c53-c049c8b7d205",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -149,21 +122,56 @@
                     "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Combat",
+            "id": "70624c9f-122a-40fd-8165-7006a9a7267f",
+            "actions": [
+                {
+                    "name": "Spell",
+                    "type": "Button",
+                    "id": "91e9f394-50fe-40f9-9564-8fd9b862abfc",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
+                    "name": "Parry",
+                    "type": "Button",
+                    "id": "846000cb-157d-46f8-b5ce-86292ed0600c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwordAttack",
+                    "type": "Button",
+                    "id": "bcee2f81-b476-4676-8d76-d6b365c966fd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
                     "name": "",
-                    "id": "1ca1262a-12cb-4893-b8d2-971ac6d10f41",
-                    "path": "<Mouse>/leftButton",
+                    "id": "200c3ad5-56ec-406a-8ba3-b821154ad22c",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwordAttack",
+                    "action": "Spell",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "cafa465e-e003-42b9-8d02-a88bcf40a998",
+                    "id": "6b2a0509-8607-4f6d-b2dc-5093b3cff3a2",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
@@ -174,12 +182,12 @@
                 },
                 {
                     "name": "",
-                    "id": "65d47e73-cf41-41ed-8759-77545078378b",
-                    "path": "<Keyboard>/q",
+                    "id": "41cba689-e935-40f4-9985-808e79fb37fc",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Spell",
+                    "action": "SwordAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
