@@ -18,10 +18,10 @@ public class PlayerCombatState : MonoBehaviour
     {
         _input = new PlayerInputActions();
 
-        _input.Player.SwordAttack.performed += _ => TrySwordAttack();
-        _input.Player.Parry.performed += _ => TryParry();
-        _input.Player.Spell.performed += _ => TryCastSpell();    // single Spell action now
-        _input.Player.Spell.canceled += _ => TryExitSpell();
+        _input.Combat.SwordAttack.performed += _ => TrySwordAttack();
+        _input.Combat.Parry.performed += _ => TryParry();
+        _input.Combat.Spell.performed += _ => TryCastSpell();    // single Spell action now
+        _input.Combat.Spell.canceled += _ => TryExitSpell();
     }
 
     private void Start()
