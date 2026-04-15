@@ -18,6 +18,7 @@ public class PlayerAnimator : MonoBehaviour
     public const int WALK = 1;
     public const int RUN = 2;
     public const int DASH = 3;
+    public const int ATTACK = 4;
     // To add more: public const int CROUCH = 4; — then add a transition in Animator.
 
     private Animator _animator;
