@@ -77,7 +77,7 @@ public class PlayerController : MonoBehaviour
     //  Unity Lifecycle
     // ─────────────────────────────────────────
 
-    private void Awake()
+    private void Start()
     {
         Controller = GetComponent<CharacterController>();
         Animator = GetComponent<PlayerAnimator>();
@@ -86,6 +86,7 @@ public class PlayerController : MonoBehaviour
 
         // Build input
         _input = new PlayerInputActions();
+        _input.Enable();
         _input.Player.Move.performed += ctx => MoveInput = ctx.ReadValue<Vector2>();
         _input.Player.Move.canceled += ctx => MoveInput = Vector2.zero;
         _input.Player.Run.performed += ctx => IsRunHeld = true;
@@ -111,8 +112,8 @@ public class PlayerController : MonoBehaviour
         _stateMachine.ChangeState(IdleState);
     }
 
-    private void OnEnable() => _input.Enable();
-    private void OnDisable() => _input.Disable();
+    private void OnEnable() => _input?.Enable();
+    private void OnDisable() => _input?.Disable();
 
     private void Update()
     {

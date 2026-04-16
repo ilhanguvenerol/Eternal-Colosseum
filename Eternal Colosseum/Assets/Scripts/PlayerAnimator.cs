@@ -1,55 +1,109 @@
 ﻿// PlayerAnimator.cs
-// Single place that talks to the Animator.
-// States call methods here — they never touch the Animator directly.
-// This keeps animator parameter names out of every state file.
 
 using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
 {
-    // ── Animator parameter IDs ────────────────────────────────────────────────
-    // Hashed once at startup — faster than string lookups every frame.
+    // ── Layer indices ─────────────────────────────────────────────────────────
+    private const int BASE_LAYER = 0;
+    private const int COMBAT_LAYER = 1;
+
+    // ── Parameter hashes ──────────────────────────────────────────────────────
     private static readonly int StateHash = Animator.StringToHash("State");
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int CombatStateHash = Animator.StringToHash("CombatState");
 
-    // ── State integer values ──────────────────────────────────────────────────
-    // Matches the integer values you set on each transition in the Animator.
+    // ── Base layer state values ───────────────────────────────────────────────
     public const int IDLE = 0;
     public const int WALK = 1;
     public const int RUN = 2;
     public const int DASH = 3;
-    public const int ATTACK = 4;
-    // To add more: public const int CROUCH = 4; — then add a transition in Animator.
+
+    // ── Combat layer state values ─────────────────────────────────────────────
+    public const int COMBAT_NONE = 0;
+    public const int COMBAT_SWORD = 1;
+    public const int COMBAT_PARRY = 2;
+    public const int COMBAT_SPELL = 3;
+
+    // ── Spell clip placeholder name ───────────────────────────────────────────
+    // This must match the name of the placeholder clip assigned to the
+    // SpellBase state in your Animator. Any dummy clip works — name matters.
+    private const string SPELL_PLACEHOLDER = "SpellBase";
 
     private Animator _animator;
+    private AnimatorOverrideController _overrideController;
 
-    private void Awake() => _animator = GetComponent<Animator>();
+    private bool _combatLocked;
 
-    // ── Public API ────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Sets the active locomotion state. Call once in each state's Enter().
-    /// </summary>
-    public void SetState(int state)
+    private void Awake()
     {
-        _animator.SetInteger(StateHash, state);
+        _animator = GetComponent<Animator>();
+
+        // Wrap the original controller so we can swap clips at runtime
+        // without modifying the original Animator asset
+        _overrideController = new AnimatorOverrideController(_animator.runtimeAnimatorController);
+        _animator.runtimeAnimatorController = _overrideController;
+    }
+
+    // ── Base layer API ────────────────────────────────────────────────────────
+
+    public void SetState(int state) => _animator.SetInteger(StateHash, state);
+    public void SetSpeed(float speed) => _animator.SetFloat(SpeedHash, speed, 0.1f, Time.deltaTime);
+
+    // ── Combat layer API ──────────────────────────────────────────────────────
+
+    public void PlayCombatOneShot(int combatState)
+    {
+        if (_combatLocked) return;
+        _combatLocked = true;
+        _animator.SetInteger(CombatStateHash, combatState);
     }
 
     /// <summary>
-    /// Sets the normalised movement speed (0–1) for blend trees.
-    /// Call every Tick() in movement states.
+    /// Equips a spell — swaps the SpellBase clip to the spell's unique animation.
+    /// Call this when the player selects a spell, not when they cast it.
     /// </summary>
-    public void SetSpeed(float speed)
+    public void EquipSpell(SpellData spell)
     {
-        _animator.SetFloat(SpeedHash, speed, 0.1f, Time.deltaTime); // 0.1s damp prevents jitter
+        if (spell == null || spell.CastAnimation == null)
+        {
+            Debug.LogWarning($"[PlayerAnimator] SpellData '{spell?.SpellName}' has no CastAnimation assigned.");
+            return;
+        }
+
+        _overrideController[SPELL_PLACEHOLDER] = spell.CastAnimation;
     }
 
     /// <summary>
-    /// Force-exits any current animation immediately and goes to a state by name.
-    /// Only use this for hard interrupts (e.g. hit reaction, death).
+    /// Starts playing the equipped spell animation. EquipSpell() must be
+    /// called first — otherwise the placeholder clip plays.
     /// </summary>
-    public void PlayImmediate(string stateName, int layer = 0)
+    public void PlaySpell()
     {
+        if (_combatLocked) return;
+        _animator.SetInteger(CombatStateHash, COMBAT_SPELL);
+    }
+
+    public void ExitCombat()
+    {
+        _combatLocked = false;
+        _animator.SetInteger(CombatStateHash, COMBAT_NONE);
+    }
+
+    // ── Animation Event ───────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Add this as an Animation Event on the last frame of SwordAttack and Parry.
+    /// </summary>
+    public void OnOneShotComplete() => ExitCombat();
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    public bool IsCombatLocked => _combatLocked;
+
+    public float GetCombatNormalizedTime() =>
+        _animator.GetCurrentAnimatorStateInfo(COMBAT_LAYER).normalizedTime;
+
+    public void PlayImmediate(string stateName, int layer = BASE_LAYER) =>
         _animator.Play(stateName, layer, 0f);
-    }
 }
