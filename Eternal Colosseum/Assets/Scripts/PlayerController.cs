@@ -104,10 +104,6 @@ public class PlayerController : MonoBehaviour
         RunState = new PlayerRunState(this);
         DashState = new PlayerDashState(this);
 
-    }
-
-    private void Start()
-    {
         // Start in Idle (safely, after all Awakes have finished)
         _stateMachine.ChangeState(IdleState);
     }
