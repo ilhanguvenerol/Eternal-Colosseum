@@ -92,10 +92,10 @@ public class PlayerController : MonoBehaviour
         _input.Player.Run.performed += ctx => IsRunHeld = true;
         _input.Player.Run.canceled += ctx => IsRunHeld = false;
         _input.Player.Dash.performed += ctx => DashPressed = true;  // state will consume this
-        _input.Player.Attack.performed += ctx => {
+        /*_input.Player.Attack.performed += ctx => {
             if (_stateMachine.CurrentState != DashState) // Don't attack while dashing
                 ChangeState(AttackState);
-        };
+        };*/
 
         // Build states (pass 'this' so every state has access to shared data)
         _stateMachine = new StateMachine();

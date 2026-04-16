@@ -53,6 +53,7 @@ public class PlayerCombatState : MonoBehaviour
     {
         if (_player.Animator.IsCombatLocked) return;
         _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
+
     }
 
     private void TryParry()
