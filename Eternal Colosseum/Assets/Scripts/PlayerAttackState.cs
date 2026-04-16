@@ -12,11 +12,11 @@ public class PlayerAttackState : PlayerBaseState
         _timer = _attackDuration;
 
         // Ensure the player doesn't slide while attacking
-        Player.CurrentVelocity = Vector3.zero;
+        Player.CurrentVelocity = Vector3.zero; //Attack animations are handled separately from movement, player should walk and attack simultaneously
 
         // 1. Trigger the animation using the constant from your Animator script
         // Note: Make sure you added 'public const int ATTACK = 4;' to PlayerAnimator.cs
-        Player.Animator.SetState(PlayerAnimator.ATTACK);
+        //Player.Animator.SetState(PlayerAnimator.ATTACK);
 
         // 2. Inventory Logic: Calculate damage using your modular system
         if (Inventory.Instance.equippedWeapon != null)
