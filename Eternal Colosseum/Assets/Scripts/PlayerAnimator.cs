@@ -12,6 +12,7 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int StateHash = Animator.StringToHash("State");
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int CombatStateHash = Animator.StringToHash("CombatState");
+    private static readonly int AttackTriggerHash = Animator.StringToHash("Attack");
 
     // ── Base layer state values ───────────────────────────────────────────────
     public const int IDLE = 0;
@@ -88,6 +89,11 @@ public class PlayerAnimator : MonoBehaviour
     {
         _combatLocked = false;
         _animator.SetInteger(CombatStateHash, COMBAT_NONE);
+    }
+
+    public void TriggerAttack()
+    {
+        _animator.SetTrigger(AttackTriggerHash);
     }
 
     // ── Animation Event ───────────────────────────────────────────────────────

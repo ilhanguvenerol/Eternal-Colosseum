@@ -11,24 +11,26 @@ public class PlayerAttackState : PlayerBaseState
     {
         _timer = _attackDuration;
 
-        // Ensure the player doesn't slide while attacking
-        Player.CurrentVelocity = Vector3.zero; //Attack animations are handled separately from movement, player should walk and attack simultaneously
+        // 1. Decoupled Animation Trigger
+        // We no longer force an integer state. This lets the Animator handle 
+        Player.Animator.TriggerAttack();
 
-        // 1. Trigger the animation using the constant from your Animator script
-        // Note: Make sure you added 'public const int ATTACK = 4;' to PlayerAnimator.cs
-        //Player.Animator.SetState(PlayerAnimator.ATTACK);
+        // 2. Movement Logic
+        // Keeping this zeroed ensures the attack has "weight" 
+        Player.CurrentVelocity = Vector3.zero;
 
-        // 2. Inventory Logic: Calculate damage using your modular system
-        if (Inventory.Instance.equippedWeapon != null)
+        // 3. Inventory Handshake
+        // Pulling the real-time damage from your ScriptableObjects
+        if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
         {
             float totalDamage = Inventory.Instance.equippedWeapon.baseDamage + Inventory.Instance.GetTotalBonusDamage();
 
-            Debug.Log($"[INVENTORY CHECK] Weapon: {Inventory.Instance.equippedWeapon.weaponName}");
-            Debug.Log($"[COMBAT LOG] Total Damage: {totalDamage} (Base + Bonuses)");
+            Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
+            Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
         }
         else
         {
-            Debug.LogWarning("No weapon equipped in Inventory!");
+            Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
         }
     }
 
