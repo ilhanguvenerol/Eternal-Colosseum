@@ -24,6 +24,7 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
+        // Assign instance immediately so other scripts' Start() can find it
         if (Instance == null)
         {
             Instance = this;

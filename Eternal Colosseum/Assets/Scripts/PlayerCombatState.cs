@@ -53,6 +53,18 @@ public class PlayerCombatState : MonoBehaviour
     {
         if (_player.Animator.IsCombatLocked) return;
         _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
+
+        if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
+        {
+            float totalDamage = Inventory.Instance.equippedWeapon.baseDamage + Inventory.Instance.GetTotalBonusDamage();
+
+            Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
+            Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
+        }
+        else
+        {
+            Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
+        }
     }
 
     private void TryParry()

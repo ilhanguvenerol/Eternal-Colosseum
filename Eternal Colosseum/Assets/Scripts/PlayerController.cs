@@ -65,7 +65,6 @@ public class PlayerController : MonoBehaviour
     public PlayerWalkState WalkState { get; private set; }
     public PlayerRunState RunState { get; private set; }
     public PlayerDashState DashState { get; private set; }
-    public PlayerAttackState AttackState { get; private set; }
 
     // ─────────────────────────────────────────
     //  Input
@@ -81,7 +80,6 @@ public class PlayerController : MonoBehaviour
     {
         Controller = GetComponent<CharacterController>();
         Animator = GetComponent<PlayerAnimator>();
-        AttackState = new PlayerAttackState(this);
         MainCamera = Camera.main;
 
         // Build input
@@ -92,10 +90,8 @@ public class PlayerController : MonoBehaviour
         _input.Player.Run.performed += ctx => IsRunHeld = true;
         _input.Player.Run.canceled += ctx => IsRunHeld = false;
         _input.Player.Dash.performed += ctx => DashPressed = true;  // state will consume this
-        _input.Player.Attack.performed += ctx => {
-            if (_stateMachine.CurrentState != DashState) // Don't attack while dashing
-                ChangeState(AttackState);
-        };
+        _input.Combat.Enable();
+
 
         // Build states (pass 'this' so every state has access to shared data)
         _stateMachine = new StateMachine();
