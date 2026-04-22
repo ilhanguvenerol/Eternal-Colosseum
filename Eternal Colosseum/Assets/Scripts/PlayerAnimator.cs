@@ -22,7 +22,7 @@ public class PlayerAnimator : MonoBehaviour
 
     private Animator _animator;
 
-    private void Awake() => _animator = GetComponent<Animator>();
+    private void Start() => _animator = GetComponent<Animator>();
 
     // ── Public API ────────────────────────────────────────────────────────────
 
