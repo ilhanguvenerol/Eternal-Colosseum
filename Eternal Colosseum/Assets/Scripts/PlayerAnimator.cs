@@ -36,7 +36,6 @@ public class PlayerAnimator : MonoBehaviour
 
     private bool _combatLocked;
 
-
     private void Awake()
     {
         _animator = GetComponent<Animator>();
