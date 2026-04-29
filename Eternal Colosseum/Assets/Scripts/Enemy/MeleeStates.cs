@@ -79,4 +79,58 @@ namespace EternalColosseum.EnemyAI
             e.Agent.isStopped = true;
         }
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // MELEE — SUPPORT
+    // Holds at SupportRadius from the player.
+    // Transitions to Engage when:
+    //   (a) signalled by another enemy (call NotifySwap())
+    //   (b) the player walks within AttackRange of this unit
+    // ─────────────────────────────────────────────────────────────────────────
+    public class MeleeSupportState : IEnemyState
+    {
+        bool _swapSignalled;
+
+        public void Enter(EnemyController e)
+        {
+            _swapSignalled    = false;
+            e.Agent.isStopped = false;
+            e.Animator?.SetTrigger("Support");
+        }
+
+        public void Execute(EnemyController e)
+        {
+            if (e.Player == null) return;
+
+            float dist = e.DistanceToPlayer();
+
+            // Player walked into this unit's range — engage immediately
+            if (dist <= e.AttackRange)
+            {
+                e.GoMeleeEngage();
+                return;
+            }
+
+            // Another enemy requested a swap
+            if (_swapSignalled)
+            {
+                e.GoMeleeEngage();
+                return;
+            }
+
+            // Orbit at support radius
+            Vector3 dir    = (e.transform.position - e.Player.position).normalized;
+            Vector3 orbitPos = e.Player.position + dir * e.SupportRadius;
+            e.Agent.SetDestination(orbitPos);
+        }
+
+        public void Exit(EnemyController e)
+        {
+            _swapSignalled    = false;
+            e.Agent.isStopped = true;
+        }
+
+        // Called by an external coordinator (e.g. EnemySquadManager) to trigger swap
+        public void NotifySwap() => _swapSignalled = true;
+    }
 }
