@@ -92,4 +92,51 @@ namespace EternalColosseum.EnemyAI
             e.Animator?.SetTrigger("Fire");
         }
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // RANGED — DISENGAGE
+    // Runs away from the player until a safe distance is re-established.
+    // Requires a Guard melee ally. If the guard is lost mid-flee, falls back to Loose.
+    // ─────────────────────────────────────────────────────────────────────────
+    public class RangedDisengageState : IEnemyState
+    {
+        float _safeDistance;
+
+        public void Enter(EnemyController e)
+        {
+            _safeDistance     = e.AttackRange + 3f;   // re-engage from here
+            e.Agent.isStopped = false;
+            e.Animator?.SetTrigger("Disengage");
+        }
+
+        public void Execute(EnemyController e)
+        {
+            if (e.Player == null) return;
+
+            // Guard was lost — stop fleeing
+            if (!e.HasGuard())
+            {
+                e.GoRangedLoose();
+                return;
+            }
+
+            float dist = e.DistanceToPlayer();
+
+            if (dist >= _safeDistance)
+            {
+                // Safe again — resume firing
+                e.GoRangedLoose();
+                return;
+            }
+
+            // Move directly away from player
+            Vector3 fleeDir = (e.transform.position - e.Player.position).normalized;
+            e.Agent.SetDestination(e.transform.position + fleeDir * 4f);
+        }
+
+        public void Exit(EnemyController e)
+        {
+            e.Agent.isStopped = true;
+        }
+    }
 }
