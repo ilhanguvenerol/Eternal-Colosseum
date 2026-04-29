@@ -23,6 +23,13 @@ namespace EternalColosseum.EnemyAI
             // Close enough to attack — handled by a separate AttackState or combat system
             // No automatic transition here; the combat system will call GoMeleeFlank /
             // GoMeleeSupport externally to vary behaviour after each attack.
+            if (e.PlayerInRange(e.AttackRange))
+            {
+                // Hook: trigger your attack animation / damage here before transitioning
+                e.Animator?.SetTrigger("Attack");
+                e.DecidePostReachTransition();
+            }
+
         }
 
         public void Exit(EnemyController e)
