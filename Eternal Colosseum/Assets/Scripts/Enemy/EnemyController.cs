@@ -25,6 +25,7 @@ namespace EternalColosseum.EnemyAI
         [HideInInspector] public Transform       Player;
         [HideInInspector] public EnemyController GuardTarget;    // ranged unit this melee is guarding
         [HideInInspector] public EnemyController AssignedGuard;  // guard assigned to this ranged unit
+        [HideInInspector] public EnemySquadManager Squad;
 
         // ── Internal ─────────────────────────────────────────────────────────
         public NavMeshAgent Agent     { get; private set; }
@@ -87,6 +88,31 @@ namespace EternalColosseum.EnemyAI
         public void GoRangedEngage()   => TransitionTo(_rangedEngage);
         public void GoRangedLoose()    => TransitionTo(_rangedLoose);
         public void GoRangedDisengage()=> TransitionTo(_rangedDisengage);
+
+        // Called when a melee enemy reaches attack range.
+        // Guard duty overrides everything.
+        // If the squad is full on engagers, peel off to Flank or Support.
+        // Otherwise keep engaging.
+        public void DecidePostReachTransition()
+        {
+            if (GuardTarget != null)
+            {
+                GoMeleeGuard();
+                return;
+            }
+
+            if (Squad != null && !Squad.CanEngage)
+            {
+                // Squad is at capacity — flank or fall back to support
+                if (Random.value < FlankOddsSupport)
+                    GoMeleeSupport();
+                else
+                    GoMeleeFlank();
+                return;
+            }
+
+            // Slot is free — stay engaged
+        }
 
         // ── Utility ───────────────────────────────────────────────────────────
         public float DistanceToPlayer()
