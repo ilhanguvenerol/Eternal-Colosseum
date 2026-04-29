@@ -19,8 +19,26 @@ namespace EternalColosseum.EnemyAI
         [Header("Spawn points")]
         public Transform[] SpawnPoints;
 
+        [Header("Engagement")]
+        [Tooltip("Maximum number of melee enemies allowed to Engage simultaneously.")]
+        public int MaxEngagingEnemies = 2;
+
         readonly List<EnemyController> _meleeUnits  = new();
         readonly List<EnemyController> _rangedUnits = new();
+
+        // ── Engaging count ────────────────────────────────────────────────────
+        public int EngagingCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (EnemyController m in _meleeUnits)
+                    if (m.CurrentState is MeleeEngageState) count++;
+                return count;
+            }
+        }
+
+        public bool CanEngage => EngagingCount < MaxEngagingEnemies;
 
         // ── Spawn ─────────────────────────────────────────────────────────────
         public void SpawnWave()
