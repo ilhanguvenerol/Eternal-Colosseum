@@ -9,7 +9,7 @@ public class PlayerMana : MonoBehaviour
 
     [Header("Mana Settings")]
     [SerializeField] private float maxMana = 100f;
-    [SerializeField] private float manaPerHit = 15f;      // düşmana her vuruşta kazanılan mana
+    //[SerializeField] private float manaPerHit = 15f;      // düşmana her vuruşta kazanılan mana
 
     // ─────────────────────────────────────────
     //  Events

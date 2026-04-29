@@ -68,7 +68,7 @@ public class PlayerCombatState : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-            EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+           EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
 
             if (enemy != null)
             {

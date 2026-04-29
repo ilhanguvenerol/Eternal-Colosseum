@@ -926,7 +926,7 @@ GameObject:
   - component: {fileID: 1391849135}
   - component: {fileID: 1391849134}
   - component: {fileID: 1391849133}
-  - component: {fileID: 1391849132}
+  - component: {fileID: 1391849137}
   m_Layer: 0
   m_Name: enemy
   m_TagString: Untagged
@@ -934,20 +934,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1391849132
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1391849131}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0dad699d99e5d4478370c8fda70aac7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 100
-  manaRewardOnHit: 15
 --- !u!136 &1391849133
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1043,6 +1029,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1391849137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1391849131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 985a10bd0a80b1445816c5ae9c28bb25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 100
+  manaRewardOnHit: 15
 --- !u!1001 &1468115941
 PrefabInstance:
   m_ObjectHideFlags: 0
