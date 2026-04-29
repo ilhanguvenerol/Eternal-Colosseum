@@ -50,22 +50,37 @@ public class PlayerCombatState : MonoBehaviour
     // ── Combat Actions ────────────────────────────────────────────────────────
 
     private void TrySwordAttack()
+{
+    if (_player.Animator.IsCombatLocked) return;
+
+    _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
+
+    if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
     {
-        if (_player.Animator.IsCombatLocked) return;
-        _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
+        float totalDamage = Inventory.Instance.equippedWeapon.baseDamage + Inventory.Instance.GetTotalBonusDamage();
 
-        if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
-        {
-            float totalDamage = Inventory.Instance.equippedWeapon.baseDamage + Inventory.Instance.GetTotalBonusDamage();
+        Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
+        Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
 
-            Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
-            Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
-        }
-        else
+        PlayerMana playerMana = _player.GetComponent<PlayerMana>();
+
+        Collider[] hits = Physics.OverlapSphere(_player.transform.position, 2f);
+
+        foreach (Collider hit in hits)
         {
-            Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
+            EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+
+            if (enemy != null)
+            {
+                enemy.TakeDamage(totalDamage, playerMana);
+            }
         }
     }
+    else
+    {
+        Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
+    }
+}
 
     private void TryParry()
     {
