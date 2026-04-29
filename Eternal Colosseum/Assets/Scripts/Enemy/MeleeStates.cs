@@ -133,4 +133,38 @@ namespace EternalColosseum.EnemyAI
         // Called by an external coordinator (e.g. EnemySquadManager) to trigger swap
         public void NotifySwap() => _swapSignalled = true;
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // MELEE — GUARD
+    // Stays between the player and a designated ranged ally.
+    // GuardTarget must be set on the EnemyController before entering this state.
+    // ─────────────────────────────────────────────────────────────────────────
+    public class MeleeGuardState : IEnemyState
+    {
+        public void Enter(EnemyController e)
+        {
+            e.Agent.isStopped = false;
+            e.Animator?.SetTrigger("Guard");
+        }
+
+        public void Execute(EnemyController e)
+        {
+            if (e.Player == null || e.GuardTarget == null)
+            {
+                e.GoMeleeEngage();   // lost assignment — fall back
+                return;
+            }
+
+            // Position on the line between player and ranged ally, closer to the player
+            Vector3 toArcher = (e.GuardTarget.transform.position - e.Player.position).normalized;
+            Vector3 guardPos  = e.Player.position + toArcher * (e.AttackRange * 1.2f);
+
+            e.Agent.SetDestination(guardPos);
+        }
+
+        public void Exit(EnemyController e)
+        {
+            e.Agent.isStopped = true;
+        }
+    }
 }
