@@ -183,13 +183,14 @@ MonoBehaviour:
   IsCelestial: 0
   AttackRange: 3
   MeleeThreshold: 3.5
-  SupportRadius: 8
+  SupportRadius: 20
   MoveSpeed: 3.5
   FlankArcAngle: 120
   FlankOddsSupport: 0.2
   Player: {fileID: 0}
   GuardTarget: {fileID: 0}
   AssignedGuard: {fileID: 0}
+  Squad: {fileID: 0}
 --- !u!95 &8753988751009377612
 Animator:
   serializedVersion: 7
