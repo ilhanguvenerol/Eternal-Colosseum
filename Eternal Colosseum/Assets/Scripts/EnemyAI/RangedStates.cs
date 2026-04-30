@@ -16,7 +16,7 @@ namespace EternalColosseum.EnemyAI
 
         public void Execute(EnemyController e)
         {
-            if (e.Player == null) return;
+            if (e.TargetPoints == null) return;
 
             if (e.PlayerInRange(e.AttackRange))
             {
@@ -24,7 +24,7 @@ namespace EternalColosseum.EnemyAI
                 return;
             }
 
-            e.Agent.SetDestination(e.Player.position);
+            e.Agent.SetDestination(e.TargetPoints.PlayerTransform.position);
         }
 
         public void Exit(EnemyController e)
@@ -52,10 +52,10 @@ namespace EternalColosseum.EnemyAI
 
         public void Execute(EnemyController e)
         {
-            if (e.Player == null) return;
+            if (e.TargetPoints == null) return;
 
             // Face the player
-            Vector3 look = e.Player.position - e.transform.position;
+            Vector3 look = e.TargetPoints.PlayerTransform.position - e.transform.position;
             look.y = 0f;
             if (look != Vector3.zero)
                 e.transform.rotation = Quaternion.LookRotation(look);
@@ -111,7 +111,7 @@ namespace EternalColosseum.EnemyAI
 
         public void Execute(EnemyController e)
         {
-            if (e.Player == null) return;
+            if (e.TargetPoints == null) return;
 
             // Guard was lost — stop fleeing
             if (!e.HasGuard())
@@ -130,7 +130,7 @@ namespace EternalColosseum.EnemyAI
             }
 
             // Move directly away from player
-            Vector3 fleeDir = (e.transform.position - e.Player.position).normalized;
+            Vector3 fleeDir = (e.transform.position - e.TargetPoints.PlayerTransform.position).normalized;
             e.Agent.SetDestination(e.transform.position + fleeDir * 4f);
         }
 
