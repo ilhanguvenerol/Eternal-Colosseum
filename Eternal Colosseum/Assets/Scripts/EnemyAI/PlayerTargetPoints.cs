@@ -52,6 +52,10 @@ namespace EternalColosseum.EnemyAI
         // Returns the world position for a given index.
         public Vector3 GetPosition(int index) => Positions[index];
 
+        // Direct reference to the player transform.
+        // Ranged states use this for aiming; melee states use transform.position.
+        public Transform PlayerTransform => transform;
+
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
         {
