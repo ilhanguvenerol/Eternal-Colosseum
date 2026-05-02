@@ -19,26 +19,42 @@ namespace EternalColosseum.EnemyAI
         public PlayerTargetPoints TargetPoints;
 
         [Header("Support Ring")]
-        [Tooltip("Radius of the outer ring where unassigned melee enemies wait.")]
+        [Tooltip("Radius of the continuous ring where unassigned melee enemies wait.")]
         public float SupportRadius = 7f;
 
-        // ── References ────────────────────────────────────────────────────────
+        [Tooltip("How strongly support enemies repel each other along the ring. Higher = wider spread.")]
+        public float RepulsionStrength = 2f;
+
+        [Tooltip("Minimum angular separation (degrees) before repulsion kicks in.")]
+        public float MinSeparationDeg = 30f;
+
+        [Tooltip("How fast (radians/sec) each enemy's angle slides toward its desired angle.")]
+        public float AngleSlideSpeed = 1.5f;
+
+        [Tooltip("Enemy only moves if its ring position shifted more than this distance.")]
+        public float MoveThreshold = 0.3f;
+
+        [Header("Assignment Stability")]
+        [Tooltip("A new engage point must be this much closer (squared) before an enemy abandons its current one.")]
+        public float ReassignmentThreshold = 4f;
+
+        // ── References ───────────────────────────────────────────────────────
         PlayerTargetPoints _targetPoints;
 
-        // ── Tracking ──────────────────────────────────────────────────────────
+        // ── Tracking ─────────────────────────────────────────────────────────
         readonly List<EnemyController> _allMelee = new();
         readonly List<EnemyController> _allRanged = new();
 
-        // pointIndex → assigned enemy  (-1 key means unassigned)
         readonly Dictionary<int, EnemyController> _engageAssignments = new();
 
-        // support enemy → their support ring position index
-        readonly Dictionary<EnemyController, int> _supportPositions = new();
-
-        // World-space support ring positions (recalculated when group changes)
-        Vector3[] _supportRingPositions = System.Array.Empty<Vector3>();
+        // Continuous ring: each support enemy owns a current angle (radians)
+        readonly Dictionary<EnemyController, float> _supportAngles = new();
 
         // ── Unity ─────────────────────────────────────────────────────────────
+        void Start()
+        {
+            SpawnWave(TargetPoints);
+        }
         void Update()
         {
             if (_targetPoints == null) return;
@@ -54,7 +70,7 @@ namespace EternalColosseum.EnemyAI
             _allMelee.Clear();
             _allRanged.Clear();
             _engageAssignments.Clear();
-            _supportPositions.Clear();
+            _supportAngles.Clear();
 
             for (int i = 0; i < TotalEnemies; i++)
             {
@@ -79,21 +95,13 @@ namespace EternalColosseum.EnemyAI
         }
 
         // ── Engagement assignment ─────────────────────────────────────────────
-        // Every frame: for each melee enemy, check whether a closer free point
-        // exists. If so, reassign. Enemies without a point go to Support ring.
         void RecalculateEngagements()
         {
-            // Build reverse lookup: enemy → currently assigned point index
-            Dictionary<EnemyController, int> currentAssignment = new();
+            // Build reverse lookup: enemy → currently held point
+            Dictionary<EnemyController, int> held = new();
             foreach (var kv in _engageAssignments)
-                currentAssignment[kv.Value] = kv.Key;
+                held[kv.Value] = kv.Key;
 
-            // Release all assignments — we'll reassign cleanly each tick.
-            // This is safe because assignment is O(n*m) and n is small.
-            _engageAssignments.Clear();
-
-            // Sort melee enemies by distance to their closest available point
-            // so nearer enemies get priority.
             List<EnemyController> unguarded = new();
             foreach (EnemyController e in _allMelee)
             {
@@ -101,107 +109,150 @@ namespace EternalColosseum.EnemyAI
                 unguarded.Add(e);
             }
 
+            // Nearest to any point gets first pick
             unguarded.Sort((a, b) =>
-            {
-                int ia = _targetPoints.GetClosestPointIndex(a.transform.position);
-                int ib = _targetPoints.GetClosestPointIndex(b.transform.position);
-                float da = Vector3.SqrMagnitude(_targetPoints.GetPosition(ia) - a.transform.position);
-                float db = Vector3.SqrMagnitude(_targetPoints.GetPosition(ib) - b.transform.position);
-                return da.CompareTo(db);
-            });
+                SqrDistToClosestPoint(a.transform.position)
+                    .CompareTo(SqrDistToClosestPoint(b.transform.position)));
 
-            bool supportChanged = false;
+            _engageAssignments.Clear();
 
             foreach (EnemyController e in unguarded)
             {
-                // Find closest point not yet taken
-                int point = GetClosestFreePoint(e.transform.position);
-                if (point >= 0)
+                int currentPoint = held.TryGetValue(e, out int cp) ? cp : -1;
+                float currentDist = currentPoint >= 0
+                    ? Vector3.SqrMagnitude(_targetPoints.GetPosition(currentPoint) - e.transform.position)
+                    : float.MaxValue;
+
+                // Find best free point
+                int bestPoint = -1;
+                float bestDist = float.MaxValue;
+                for (int i = 0; i < _targetPoints.PointCount; i++)
                 {
-                    _engageAssignments[point] = e;
+                    if (_engageAssignments.ContainsKey(i)) continue;
+                    float d = Vector3.SqrMagnitude(_targetPoints.GetPosition(i) - e.transform.position);
+                    if (d < bestDist) { bestDist = d; bestPoint = i; }
+                }
 
-                    bool wasInSupport = _supportPositions.ContainsKey(e);
-
-                    bool isClosestPoint = point == _targetPoints.GetClosestPointIndex(e.transform.position);
-                    e.AssignEngagePoint(point, isClosestPoint);
-
-                    if (wasInSupport)
-                    {
-                        _supportPositions.Remove(e);
-                        supportChanged = true;
-                    }
-
+                if (bestPoint < 0)
+                {
+                    AddToSupport(e);
                     continue;
                 }
 
-                // No free point — enemy goes to support ring
-                if (!_supportPositions.ContainsKey(e))
-                {
-                    _supportPositions[e] = -1;  // index assigned below
-                    supportChanged = true;
-                }
+                bool currentStillFree = currentPoint >= 0
+                    && !_engageAssignments.ContainsKey(currentPoint);
 
-                if (e.CurrentState is not MeleeSupportState)
-                    e.GoMeleeSupport();
+                int chosenPoint = (currentStillFree && bestDist >= currentDist - ReassignmentThreshold)
+                    ? currentPoint
+                    : bestPoint;
+
+                AssignEngagePoint(e, chosenPoint);
+                RemoveFromSupport(e);
             }
-
-            if (supportChanged)
-                RebuildSupportRing();
         }
 
-        int GetClosestFreePoint(Vector3 from)
+        void AssignEngagePoint(EnemyController e, int pointIndex)
         {
-            int best = -1;
-            float bestDist = float.MaxValue;
+            _engageAssignments[pointIndex] = e;
+            bool isClosest = pointIndex == _targetPoints.GetClosestPointIndex(e.transform.position);
+            e.AssignEngagePoint(pointIndex, isClosest);
+        }
+
+        float SqrDistToClosestPoint(Vector3 pos)
+        {
+            float best = float.MaxValue;
             for (int i = 0; i < _targetPoints.PointCount; i++)
             {
-                if (_engageAssignments.ContainsKey(i)) continue;
-                float d = Vector3.SqrMagnitude(_targetPoints.GetPosition(i) - from);
-                if (d < bestDist) { bestDist = d; best = i; }
+                float d = Vector3.SqrMagnitude(_targetPoints.GetPosition(i) - pos);
+                if (d < best) best = d;
             }
             return best;
         }
 
-        // ── Support ring ──────────────────────────────────────────────────────
-        void RebuildSupportRing()
+        // ── Continuous support ring ───────────────────────────────────────────
+        // No slots. Each enemy owns an angle on the ring and slides toward
+        // its desired angle each frame. Desired angle = current angle pushed
+        // away from neighbours by a repulsion force. Enemies naturally drift
+        // to even spacing without any redistribution pass.
+        void AddToSupport(EnemyController e)
         {
-            List<EnemyController> supporters = new(_supportPositions.Keys);
-            int count = supporters.Count;
-
-            if (count == 0)
+            if (!_supportAngles.ContainsKey(e))
             {
-                _supportRingPositions = System.Array.Empty<Vector3>();
-                return;
+                // Initial angle: project the enemy's current world position onto the ring
+                Vector3 toEnemy = e.transform.position - _targetPoints.transform.position;
+                toEnemy.y = 0f;
+                float initialAngle = toEnemy == Vector3.zero
+                    ? 0f
+                    : Mathf.Atan2(toEnemy.z, toEnemy.x);
+
+                _supportAngles[e] = initialAngle;
             }
 
-            _supportRingPositions = new Vector3[count];
+            if (e.CurrentState is not MeleeSupportState)
+                e.GoMeleeSupport();
+        }
 
-            float angleStep = 360f / count;
-            for (int i = 0; i < count; i++)
-            {
-                float angle = i * angleStep * Mathf.Deg2Rad;
-                _supportRingPositions[i] = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * SupportRadius;
-                // Stored as offset from player — added to player position in UpdateSupportRing
-                _supportPositions[supporters[i]] = i;
-            }
+        void RemoveFromSupport(EnemyController e)
+        {
+            _supportAngles.Remove(e);
         }
 
         void UpdateSupportRing()
         {
-            if (_targetPoints == null || _supportRingPositions.Length == 0) return;
+            if (_supportAngles.Count == 0) return;
 
             Vector3 playerPos = _targetPoints.transform.position;
-            foreach (var kv in _supportPositions)
-            {
-                EnemyController e = kv.Key;
-                int idx = kv.Value;
-                if (e == null || idx < 0 || idx >= _supportRingPositions.Length) continue;
+            float minSepRad = MinSeparationDeg * Mathf.Deg2Rad;
+            var enemies = new List<EnemyController>(_supportAngles.Keys);
 
-                e.SupportTargetPosition = playerPos + _supportRingPositions[idx];
+            foreach (EnemyController e in enemies)
+            {
+                if (e == null) continue;
+
+                float angle = _supportAngles[e];
+                float totalPush = 0f;
+
+                // Accumulate repulsion from every other support enemy
+                foreach (EnemyController other in enemies)
+                {
+                    if (other == e || other == null) continue;
+
+                    float otherAngle = _supportAngles[other];
+
+                    // Shortest angular difference on the circle
+                    float diff = Mathf.DeltaAngle(
+                        angle * Mathf.Rad2Deg,
+                        otherAngle * Mathf.Rad2Deg) * Mathf.Deg2Rad;
+
+                    float absDiff = Mathf.Abs(diff);
+
+                    if (absDiff < minSepRad && absDiff > 0.001f)
+                    {
+                        // Repel proportionally to how close they are
+                        float strength = (1f - absDiff / minSepRad) * RepulsionStrength;
+                        // Push away: negative diff means other is behind us, so push forward
+                        totalPush -= Mathf.Sign(diff) * strength * Time.deltaTime;
+                    }
+                }
+
+                // Slide the angle
+                angle += totalPush;
+
+                // Keep in [0, 2π]
+                angle = (angle % (2f * Mathf.PI) + 2f * Mathf.PI) % (2f * Mathf.PI);
+                _supportAngles[e] = angle;
+
+                // Compute world target
+                Vector3 desiredPos = playerPos
+                    + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * SupportRadius;
+
+                // Only issue SetDestination when meaningfully displaced — avoids replanning jitter
+                if (Vector3.SqrMagnitude(e.SupportTargetPosition - desiredPos) > MoveThreshold * MoveThreshold)
+                    e.SupportTargetPosition = desiredPos;
             }
         }
 
-        // ── Guard assignment ───────────────────────────────────────────────────
+        // ── Guard assignment ──────────────────────────────────────────────────
         void AssignGuards()
         {
             int guardCount = Mathf.Min(_allRanged.Count, _allMelee.Count);
@@ -225,9 +276,8 @@ namespace EternalColosseum.EnemyAI
         {
             _allMelee.Remove(dead);
             _allRanged.Remove(dead);
-            _supportPositions.Remove(dead);
+            RemoveFromSupport(dead);
 
-            // Release engage point if this enemy held one
             int heldPoint = -1;
             foreach (var kv in _engageAssignments)
                 if (kv.Value == dead) { heldPoint = kv.Key; break; }
@@ -236,12 +286,6 @@ namespace EternalColosseum.EnemyAI
 
             if (dead.GuardTarget != null)
                 dead.GuardTarget.AssignedGuard = null;
-
-            RebuildSupportRing();
-        }
-        private void Start()
-        {
-            SpawnWave(TargetPoints);
         }
     }
 }
