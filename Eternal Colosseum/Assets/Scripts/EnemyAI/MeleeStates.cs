@@ -8,43 +8,60 @@ using UnityEngine;
 // ─────────────────────────────────────────────────────────────────────────────
 public class MeleeIdleState : EnemyState
 {
-    private float _directionTimer;
-    private float _orbitSign; // +1 or -1
+    // Orbit radius matches engageStopDistance so the ring sits just outside attack range
+    private const float OrbitRadiusMultiplier = 1.4f;
+    private const float ChaseMultiplier = 3f;
+    private const float AngleDriftSpeed = 0.4f;  // radians per second
+    private const float AngleDriftInterval = 1.2f;  // seconds before drift direction re-rolls
+
+    private float _angle;
+    private float _driftSign;
+    private float _driftTimer;
 
     public MeleeIdleState(EnemyBrain brain) : base(brain) { }
 
     public override void Enter()
     {
-        RollDirection();
+        // Start at the angle closest to current position so there's no
+        // sudden jump when entering this state
+        Vector3 toSelf = brain.transform.position - player.position;
+        toSelf.y = 0f;
+        _angle = Mathf.Atan2(toSelf.z, toSelf.x);
+        _driftSign = Random.value > 0.5f ? 1f : -1f;
+        _driftTimer = AngleDriftInterval;
     }
-
-    private const float ChaseMultiplier = 3f;
 
     public override void Update()
     {
         float dist = brain.DistanceToPlayer();
+        float radius = brain.engageStopDistance * OrbitRadiusMultiplier;
 
         // Player ran away — chase to close the gap, then resume orbiting
         if (dist > brain.engageStopDistance * ChaseMultiplier)
         {
-            Vector3 dir = (player.position - brain.transform.position).normalized;
-            brain.Move(dir, brain.engageSpeed);
+            brain.MoveTo(player.position, brain.engageSpeed);
             return;
         }
 
-        _directionTimer -= Time.deltaTime;
-        if (_directionTimer <= 0f)
-            RollDirection();
+        // Drift angle
+        _driftTimer -= Time.deltaTime;
+        if (_driftTimer <= 0f)
+        {
+            _driftSign = Random.value > 0.5f ? 1f : -1f;
+            _driftTimer = AngleDriftInterval;
+        }
 
-        brain.Move(brain.PerpendicularToPlayer(_orbitSign), brain.orbitSpeed);
+        _angle += _driftSign * AngleDriftSpeed * Time.deltaTime;
+
+        brain.MoveTo(brain.OrbitPosition(_angle, radius), brain.orbitSpeed);
     }
 
-    private void RollDirection()
+    public override void Exit()
     {
-        _orbitSign      = Random.value > 0.5f ? 1f : -1f;
-        _directionTimer = Random.Range(0.8f, 1.5f);
+        brain.StopMoving();
     }
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELEE ENGAGE
@@ -53,43 +70,78 @@ public class MeleeIdleState : EnemyState
 // ─────────────────────────────────────────────────────────────────────────────
 public class MeleeEngageState : EnemyState
 {
+    private const float AbandonMultiplier = 4f;
+
     public MeleeEngageState(EnemyBrain brain) : base(brain) { }
+
+    public override void Enter()
+    {
+        brain.MoveTo(player.position, brain.engageSpeed);
+    }
 
     public override void Update()
     {
         float dist = brain.DistanceToPlayer();
 
+        // Player ran far enough away — give up and return to orbit
+        if (dist > brain.engageStopDistance * AbandonMultiplier)
+        {
+            brain.ChangeState(new MeleeIdleState(brain));
+            return;
+        }
+
+        // Keep destination current as the player moves
         if (dist > brain.engageStopDistance)
         {
-            Vector3 dir = (player.position - brain.transform.position).normalized;
-            brain.Move(dir, brain.engageSpeed);
+            brain.MoveTo(player.position, brain.engageSpeed);
         }
-        // Once inside attack distance, the attack component takes over.
-        // EnemyManager will call BeginRetreat() after the attack resolves.
+        else
+        {
+            // Inside attack distance — stop and let attack component take over
+            brain.StopMoving();
+        }
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MELEE RETREAT
-// Backs away until past a safe distance, then returns to idle orbiting.
-// ─────────────────────────────────────────────────────────────────────────────
-public class MeleeRetreatState : EnemyState
+    // ─────────────────────────────────────────────────────────────────────────────
+    // MELEE RETREAT
+    // Backs away until past a safe distance, then returns to idle orbiting.
+    // ─────────────────────────────────────────────────────────────────────────────
+    public class MeleeRetreatState : EnemyState
 {
     private const float RetreatDistance = 4.5f;
 
     public MeleeRetreatState(EnemyBrain brain) : base(brain) { }
 
+    public override void Enter()
+    {
+        SetRetreatDestination();
+    }
+
     public override void Update()
     {
-        if (brain.DistanceToPlayer() < RetreatDistance)
-        {
-            brain.Move(-brain.transform.forward, brain.retreatSpeed);
-        }
-        else
+        if (brain.DistanceToPlayer() >= RetreatDistance)
         {
             brain.ChangeState(new MeleeIdleState(brain));
+            return;
         }
+
+        // Refresh destination each frame so it tracks away from a moving player
+        SetRetreatDestination();
     }
+
+    public override void Exit()
+    {
+        brain.StopMoving();
+    }
+
+    private void SetRetreatDestination()
+    {
+        Vector3 awayDir = (brain.transform.position - player.position).normalized;
+        Vector3 retreatTo = brain.transform.position + awayDir * RetreatDistance;
+        brain.MoveTo(retreatTo, brain.retreatSpeed);
+    }
+
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -125,7 +177,7 @@ public class GuardState : EnemyState
 
         // Only move if not already close enough to the goal
         if (dist > 0.3f)
-            brain.Move(dir.normalized, brain.guardSpeed);
+            brain.MoveTo(goalPosition, brain.guardSpeed);
     }
 }
 
