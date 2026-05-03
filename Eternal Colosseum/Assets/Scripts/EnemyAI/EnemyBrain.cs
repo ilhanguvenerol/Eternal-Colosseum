@@ -93,7 +93,7 @@ public class EnemyBrain : MonoBehaviour
     // ── Helpers used by multiple states ──────────────────────────────────────
 
     public float DistanceToPlayer()
-        => Vector3.Distance(transform.position, player.position);
+        => Vector3.Distance(transform.position, Player.position);
 
     /// <summary>Move in world-space direction at given speed, gravity applied.</summary>
     public void Move(Vector3 worldDirection, float speed)
@@ -106,16 +106,16 @@ public class EnemyBrain : MonoBehaviour
     /// <summary>Direction perpendicular to the player (for orbiting).</summary>
     public Vector3 PerpendicularToPlayer(float sign)
     {
-        Vector3 toPlayer = (player.position - transform.position).normalized;
+        Vector3 toPlayer = (Player.position - transform.position).normalized;
         return Quaternion.AngleAxis(90f * sign, Vector3.up) * toPlayer;
     }
 
     private void FacePlayer()
     {
         Vector3 dir = new Vector3(
-            player.position.x - transform.position.x,
+            Player.position.x - transform.position.x,
             0f,
-            player.position.z - transform.position.z);
+            Player.position.z - transform.position.z);
 
         if (dir.sqrMagnitude > 0.001f)
             transform.rotation = Quaternion.LookRotation(dir);
