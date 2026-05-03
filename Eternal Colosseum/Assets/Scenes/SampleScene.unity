@@ -119,62 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &201618064
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 201618066}
-  - component: {fileID: 201618065}
-  m_Layer: 0
-  m_Name: EnemySquadManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &201618065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 201618064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44e48f72ba23ee346b83bbca5b640714, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.EnemySquadManager
-  TotalEnemies: 6
-  RangedChance: 0.3
-  CelestialChance: 0.15
-  MeleePrefab: {fileID: 1859766477297938151, guid: a43762024db85c345a6584145fd2330b, type: 3}
-  RangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
-  SpawnPoints:
-  - {fileID: 1535212972}
-  - {fileID: 211064032}
-  - {fileID: 1681393596}
-  - {fileID: 1646970937}
-  - {fileID: 1360054861}
-  - {fileID: 605658041}
---- !u!4 &201618066
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 201618064}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.54146, y: -0, z: -2.07189}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &211064031
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,6 +320,37 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!1 &401499258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 401499259}
+  m_Layer: 0
+  m_Name: SpawnPoint (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &401499259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401499258}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -16.9, y: 1.72, z: -14.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1693212434}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,6 +621,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 691881209}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &739246489
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 739246490}
+  m_Layer: 0
+  m_Name: SpawnPoint (6)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &739246490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 739246489}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 13.2, y: 1.72, z: -12.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1693212434}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &813185975 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
@@ -758,6 +764,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombatState
   _player: {fileID: 813185977}
   _startingSpell: {fileID: 0}
+--- !u!114 &813185986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813185975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14d06298a739b8147b129fc93aa11071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.PlayerTargetPoints
+  PointCount: 4
+  EngageRadius: 1.5
+  <Positions>k__BackingField: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +823,66 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &865620211
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 865620213}
+  - component: {fileID: 865620212}
+  m_Layer: 0
+  m_Name: SpawnManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &865620212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 865620211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58cd6b0fc29d33247a49b8fd05e08bcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.SpawnManager
+  MeleePrefab: {fileID: 1859766477297938151, guid: a43762024db85c345a6584145fd2330b, type: 3}
+  RangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
+  CelestialMeleePrefab: {fileID: 1859766477297938151, guid: a43762024db85c345a6584145fd2330b, type: 3}
+  CelestialRangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
+  SpawnPoints:
+  - {fileID: 211064032}
+  - {fileID: 1681393596}
+  - {fileID: 1646970937}
+  - {fileID: 1360054861}
+  - {fileID: 605658041}
+  - {fileID: 739246490}
+  - {fileID: 401499259}
+  - {fileID: 1535212972}
+  Scaling: {fileID: 11400000, guid: c24394572d01ebf43bd7bea098025ec9, type: 2}
+  EnemyManager: {fileID: 1818124479}
+  Player: {fileID: 813185980}
+--- !u!4 &865620213
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 865620211}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.03158, y: -0, z: -8.04059}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1146,7 +1227,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
       propertyPath: m_Name
-      value: UAL1
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
       propertyPath: m_TagString
@@ -1178,6 +1259,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
       insertIndex: -1
       addedObject: {fileID: 813185984}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 813185986}
   m_SourcePrefab: {fileID: 100100000, guid: e3bba71128477e740bbf2215de338565, type: 3}
 --- !u!1 &1535212971
 GameObject:
@@ -1307,6 +1391,56 @@ Transform:
   - {fileID: 1646970937}
   - {fileID: 1360054861}
   - {fileID: 605658041}
+  - {fileID: 739246490}
+  - {fileID: 401499259}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1818124478
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1818124480}
+  - component: {fileID: 1818124479}
+  m_Layer: 0
+  m_Name: EnemyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1818124479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818124478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c96c0f9593ae8cf489ec976f0e099ee5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyManager
+  minTurnDelay: 0.5
+  maxTurnDelay: 1.5
+  postRetreatDelay: 0.4
+  attackDuration: 1.5
+--- !u!4 &1818124480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818124478}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.03158, y: -0, z: -8.04059}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2055236175
@@ -1635,5 +1769,6 @@ SceneRoots:
   - {fileID: 2055236181}
   - {fileID: 1468115941}
   - {fileID: 2083520195}
-  - {fileID: 201618066}
   - {fileID: 1693212434}
+  - {fileID: 1818124480}
+  - {fileID: 865620213}
