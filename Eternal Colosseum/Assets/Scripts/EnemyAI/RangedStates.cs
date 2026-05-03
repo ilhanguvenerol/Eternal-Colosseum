@@ -8,21 +8,29 @@ public class RangedEngageState : EnemyState
 {
     public RangedEngageState(EnemyBrain brain) : base(brain) { }
 
+    public override void Enter()
+    {
+        brain.MoveTo(player.position, brain.engageSpeed);
+    }
+
     public override void Update()
     {
-        float dist = brain.DistanceToPlayer();
-
-        if (dist > brain.rangedFireDistance)
-        {
-            Vector3 dir = (player.position - brain.transform.position).normalized;
-            brain.Move(dir, brain.engageSpeed);
-        }
-        else
+        if (brain.DistanceToPlayer() <= brain.rangedFireDistance)
         {
             brain.ChangeState(new LooseState(brain));
+            return;
         }
+
+        // Keep destination current as the player moves
+        brain.MoveTo(player.position, brain.engageSpeed);
+    }
+
+    public override void Exit()
+    {
+        brain.StopMoving();
     }
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LOOSE
@@ -34,30 +42,36 @@ public class LooseState : EnemyState
 {
     public LooseState(EnemyBrain brain) : base(brain) { }
 
+    public override void Enter()
+    {
+        brain.StopMoving();
+    }
+
     public override void Update()
     {
         float dist = brain.DistanceToPlayer();
 
-        // Player moved out of range: give chase
+        // Player moved out of range — give chase
         if (dist > brain.rangedFireDistance * 1.2f)
         {
             brain.ChangeState(new RangedEngageState(brain));
             return;
         }
 
-        // Player too close: flee only if a guard is nearby to cover the retreat
-        if (dist < brain.disengageThreshold && HasNearbyGuard())
+        // Player too close — flee only if a guard is covering the retreat
+        if (dist < brain.disengageThreshold && HasGuard())
         {
             brain.ChangeState(new DisengageState(brain));
+            return;
         }
 
-        // Otherwise: stand still, fire. Attack component handles projectile.
+        // Stand still and fire — attack component reads this state via IsInLoose()
     }
 
-    private bool HasNearbyGuard()
+    private bool HasGuard()
     {
-        // Find all EnemyBrains in scene and check for an active Guard
-        // covering this specific ranged enemy
+        // Check if this ranged enemy has an active guard assigned to it.
+        // guardTarget on the guard points back to this brain.
         EnemyBrain[] all = Object.FindObjectsOfType<EnemyBrain>();
         foreach (EnemyBrain e in all)
         {
@@ -68,6 +82,7 @@ public class LooseState : EnemyState
     }
 }
 
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DISENGAGE
 // Runs directly away from the player until outside the disengage threshold
@@ -76,26 +91,55 @@ public class LooseState : EnemyState
 // ─────────────────────────────────────────────────────────────────────────────
 public class DisengageState : EnemyState
 {
-    // How far past the threshold to run before returning to Loose
-    private const float SafeBuffer = 2f;
+    private float _safeDistance;
 
     public DisengageState(EnemyBrain brain) : base(brain) { }
 
+    public override void Enter()
+    {
+        _safeDistance = brain.disengageThreshold + 2f;
+        SetFleeDestination();
+    }
+
     public override void Update()
     {
-        float dist    = brain.DistanceToPlayer();
-        float safeDistance = brain.disengageThreshold + SafeBuffer;
-
-        if (dist < safeDistance)
+        // Guard was lost mid-flee — stop running and face the player
+        if (!HasGuard())
         {
-            // Run directly away from the player
-            Vector3 awayDir = (brain.transform.position - player.position).normalized;
-            brain.Move(awayDir, brain.disengageSpeed);
-        }
-        else
-        {
-            // Reached safety — return to firing position
             brain.ChangeState(new LooseState(brain));
+            return;
         }
+
+        if (brain.DistanceToPlayer() >= _safeDistance)
+        {
+            brain.ChangeState(new LooseState(brain));
+            return;
+        }
+
+        // Refresh flee destination each frame to track a moving player
+        SetFleeDestination();
+    }
+
+    public override void Exit()
+    {
+        brain.StopMoving();
+    }
+
+    private void SetFleeDestination()
+    {
+        Vector3 awayDir = (brain.transform.position - player.position).normalized;
+        brain.MoveTo(brain.transform.position + awayDir * _safeDistance, brain.disengageSpeed);
+    }
+
+    private bool HasGuard()
+    {
+        EnemyBrain[] all = Object.FindObjectsOfType<EnemyBrain>();
+        foreach (EnemyBrain e in all)
+        {
+            if (e.IsGuarding() && e.guardTarget == brain)
+                return true;
+        }
+        return false;
     }
 }
+
