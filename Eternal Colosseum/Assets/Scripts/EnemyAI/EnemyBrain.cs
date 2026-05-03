@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum EnemyType { Melee, Ranged }
 
@@ -42,7 +43,7 @@ public class EnemyBrain : MonoBehaviour
     // ── Shared components ─────────────────────────────────────────────────────
 
     public Transform           Player     { get; private set; }
-    public CharacterController Controller { get; private set; }
+    public NavMeshAgent        Agent      { get; private set; }
     public Animator            Animator   { get; private set; }
 
     // ── Private ───────────────────────────────────────────────────────────────
@@ -54,8 +55,12 @@ public class EnemyBrain : MonoBehaviour
 
     private void Awake()
     {
-        Controller = GetComponent<CharacterController>();
+        Agent = GetComponent<NavMeshAgent>();
         Animator   = GetComponent<Animator>();
+
+        // Disable auto-rotation — we handle facing ourselves so enemies
+        // always look at the player regardless of movement direction
+        Agent.updateRotation = false;
     }
 
     private void Update()
@@ -90,24 +95,44 @@ public class EnemyBrain : MonoBehaviour
         _currentState.Enter();
     }
 
+    // ── Movement API (used by states) ─────────────────────────────────────────
+
+    /// <summary>
+    /// Set NavMesh destination and speed in one call.
+    /// States call this instead of manipulating the agent directly.
+    /// </summary>
+    public void MoveTo(Vector3 worldPosition, float speed)
+    {
+        Agent.isStopped = false;
+        Agent.speed = speed;
+        Agent.SetDestination(worldPosition);
+    }
+
+    /// <summary>Stop the agent in place.</summary>
+    public void StopMoving()
+    {
+        Agent.isStopped = true;
+        Agent.ResetPath();
+    }
+
+
     // ── Helpers used by multiple states ──────────────────────────────────────
 
     public float DistanceToPlayer()
-        => Vector3.Distance(transform.position, Player.position);
+        => Player != null
+            ? Vector3.Distance(transform.position, Player.position)
+            : float.MaxValue;
 
-    /// <summary>Move in world-space direction at given speed, gravity applied.</summary>
-    public void Move(Vector3 worldDirection, float speed)
+    /// <summary>
+    /// World position on a circle of radius r around the player,
+    /// at the given angle in radians.
+    /// </summary>
+    public Vector3 OrbitPosition(float angleRad, float radius)
     {
-        Vector3 motion = worldDirection.normalized * speed * Time.deltaTime;
-        motion.y = -9.81f * Time.deltaTime; // simple gravity
-        Controller.Move(motion);
-    }
-
-    /// <summary>Direction perpendicular to the player (for orbiting).</summary>
-    public Vector3 PerpendicularToPlayer(float sign)
-    {
-        Vector3 toPlayer = (Player.position - transform.position).normalized;
-        return Quaternion.AngleAxis(90f * sign, Vector3.up) * toPlayer;
+        return Player.position + new Vector3(
+            Mathf.Cos(angleRad) * radius,
+            0f,
+            Mathf.Sin(angleRad) * radius);
     }
 
     private void FacePlayer()
