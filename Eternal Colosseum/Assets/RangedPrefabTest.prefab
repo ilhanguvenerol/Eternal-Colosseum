@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 8699932205637388200}
   - component: {fileID: 3952825728474727222}
   - component: {fileID: 2840694705060612317}
-  - component: {fileID: -6281156112463001530}
   - component: {fileID: -7590082535614727301}
+  - component: {fileID: 5436526986080291494}
+  - component: {fileID: 2638496421807452206}
   m_Layer: 0
   m_Name: RangedPrefabTest
   m_TagString: Untagged
@@ -167,29 +168,6 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &-6281156112463001530
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1859766477297938151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbf9d77ee1021e946ad237a70439cfa4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.EnemyController
-  Variant: 1
-  IsCelestial: 0
-  AttackRange: 14.26
-  MeleeThreshold: 3.5
-  SupportRadius: 8
-  MoveSpeed: 3.5
-  FlankArcAngle: 90
-  FlankOddsSupport: 0.2
-  Player: {fileID: 0}
-  GuardTarget: {fileID: 0}
-  AssignedGuard: {fileID: 0}
 --- !u!95 &-7590082535614727301
 Animator:
   serializedVersion: 7
@@ -212,3 +190,53 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!143 &5436526986080291494
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859766477297938151}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2638496421807452206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859766477297938151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96ed25344b58b94eb116522a4163e3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBrain
+  enemyType: 1
+  IsCelestial: 0
+  engageSpeed: 5
+  orbitSpeed: 1.5
+  retreatSpeed: 2
+  guardSpeed: 3
+  disengageSpeed: 4
+  engageStopDistance: 2
+  rangedFireDistance: 21
+  disengageThreshold: 3
+  guardOffset: 1.2
+  currentStateName: 
+  guardTarget: {fileID: 0}
