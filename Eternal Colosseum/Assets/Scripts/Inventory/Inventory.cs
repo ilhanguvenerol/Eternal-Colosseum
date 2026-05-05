@@ -19,6 +19,9 @@ public class Inventory : MonoBehaviour
     [Header("Settings")]
     public int maxCharmSlots = 3;
 
+    [Header("Currency")]
+    public int currentGold; // The player's current gold amount, can be modified by shops, rewards, etc.
+
     [Header("References")]
     public Transform weaponSlot;
 
@@ -162,5 +165,21 @@ public class Inventory : MonoBehaviour
         equippedWeapon = null;
         equippedSkill = null;
         equippedCharms.Clear();
+    }
+
+    public bool BuyItem(ItemData itemToBuy)
+    {
+
+        if (currentGold < itemToBuy.price)
+        {
+            Debug.LogWarning($"[Shop] Not enough gold for {itemToBuy.itemName})! Need {itemToBuy.price - currentGold} more.");
+            return false;
+        }
+
+        currentGold -= itemToBuy.price;
+        ownedItems.Add(itemToBuy);
+
+        Debug.Log($"[Shop] Bought {itemToBuy.itemName} for {itemToBuy.price} gold. Remaining gold: {currentGold}");
+        return true;
     }
 }

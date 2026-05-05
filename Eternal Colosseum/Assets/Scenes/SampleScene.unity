@@ -640,6 +640,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombatState
   _player: {fileID: 813185977}
   _startingSpell: {fileID: 0}
+--- !u!114 &813185986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813185975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d008dc27cd8344caaa3e7d326f14b6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthTester
+--- !u!114 &813185987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813185975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c88e7cdeb97049d5a409e4dc61ec266, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMana
+  maxMana: 100
+  onManaChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onManaFull:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &813185988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813185975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6eb533185bef748158610359cdbbd959, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
+  canRegenerate: 0
+  regenRate: 5
+  regenDelay: 3
+  invincibilityDuration: 0.5
+  onHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,6 +735,60 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 832575517}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1041126088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1041126090}
+  - component: {fileID: 1041126089}
+  m_Layer: 0
+  m_Name: ShopManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1041126089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041126088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d2a328c9df0a54f9d08d88fa15a829, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShopManager
+  allAvailableItems:
+  - {fileID: 11400000, guid: 28ee16c5576b97942bb8e0172e916bb1, type: 2}
+  - {fileID: 11400000, guid: e94f7a8889c95bb439a464bb1d34bdc8, type: 2}
+  - {fileID: 11400000, guid: bd4ab2a7298872a4d85d1bda1e74a8fc, type: 2}
+  - {fileID: 11400000, guid: e0eaa2b37e67415438be9ce1d95afaab, type: 2}
+  rerollCost: 20
+  currentDisplayItems:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+--- !u!4 &1041126090
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041126088}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1125,6 +1233,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
       insertIndex: -1
       addedObject: {fileID: 813185984}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 813185986}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 813185988}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e3bba71128477e740bbf2215de338565, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 813185987}
   m_SourcePrefab: {fileID: 100100000, guid: e3bba71128477e740bbf2215de338565, type: 3}
 --- !u!1 &2055236175
 GameObject:
@@ -1402,7 +1519,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d4a42875ead2324ca064cdd571a8f53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
-  ownedItems: []
+  ownedItems:
+  - {fileID: 11400000, guid: d9d965d460a8bc348be16fadf0947061, type: 2}
   ownedCharms: []
   ownedSkills: []
   ownedWeapons:
@@ -1411,6 +1529,7 @@ MonoBehaviour:
   equippedSkill: {fileID: 0}
   equippedCharms: []
   maxCharmSlots: 3
+  currentGold: 100
   weaponSlot: {fileID: 1141192188}
 --- !u!4 &2083520195
 Transform:
@@ -1453,3 +1572,4 @@ SceneRoots:
   - {fileID: 1468115941}
   - {fileID: 2083520195}
   - {fileID: 1391849136}
+  - {fileID: 1041126090}

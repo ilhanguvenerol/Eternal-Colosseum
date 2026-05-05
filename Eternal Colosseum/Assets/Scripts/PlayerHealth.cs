@@ -46,6 +46,19 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
+    private void Start()
+    {
+        // Grant bonus health from inventory items/charms/skills
+        if (Inventory.Instance != null)
+        {
+            float bonusHealth = Inventory.Instance.GetTotalBonusHealth();
+            maxHealth += bonusHealth;
+            currentHealth = maxHealth; // Bonus is applied at start, so we can set current to max directly
+
+            Debug.Log($"[STATS] Total Max Health initialized to: {maxHealth}");
+        }
+    }
+
     private void Update()
     {
         HandleRegen();
