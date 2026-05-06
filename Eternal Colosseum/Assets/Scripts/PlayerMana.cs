@@ -3,37 +3,18 @@ using UnityEngine.Events;
 
 public class PlayerMana : MonoBehaviour
 {
-    // ─────────────────────────────────────────
-    //  Inspector Settings
-    // ─────────────────────────────────────────
-
     [Header("Mana Settings")]
     [SerializeField] private float maxMana = 100f;
-    [SerializeField] private float manaPerHit = 15f;      // düşmana her vuruşta kazanılan mana
 
-    // ─────────────────────────────────────────
-    //  Events
-    // ─────────────────────────────────────────
     [Header("Events")]
-    public UnityEvent<float> onManaChanged;    // UI bar için sonradan bağlanır
-    public UnityEvent onManaFull;              // mana dolunca efekt için
+    public UnityEvent<float> onManaChanged;
+    public UnityEvent onManaFull;
 
-    // ─────────────────────────────────────────
-    //  Private State
-    // ─────────────────────────────────────────
-    private float currentMana = 0f;            // başlangıçta boş
+    private float currentMana = 0f;
 
-    // ─────────────────────────────────────────
-    //  Properties
-    // ─────────────────────────────────────────
     public float CurrentMana => currentMana;
     public float MaxMana     => maxMana;
 
-    // ─────────────────────────────────────────
-    //  Public API
-    // ─────────────────────────────────────────
-
-    /// <summary>Düşmana vurunca çağrılır.</summary>
     public void GainMana(float amount)
     {
         if (currentMana >= maxMana) return;
@@ -44,7 +25,6 @@ public class PlayerMana : MonoBehaviour
         Debug.Log($"[Mana] +{amount} kazanıldı  |  Mana: {currentMana}/{maxMana}");
         onManaChanged?.Invoke(currentMana);
 
-        // mana yeni doldu mu?
         if (before < maxMana && currentMana >= maxMana)
         {
             Debug.Log("[Mana] Mana tamamen doldu!");
@@ -52,7 +32,6 @@ public class PlayerMana : MonoBehaviour
         }
     }
 
-    /// <summary>Yetenek kullanınca çağrılır.</summary>
     public void UseMana(float amount)
     {
         if (!HasEnoughMana(amount))
@@ -66,7 +45,6 @@ public class PlayerMana : MonoBehaviour
         onManaChanged?.Invoke(currentMana);
     }
 
-    /// <summary>Yetenek kullanılabilir mi kontrolü.</summary>
     public bool HasEnoughMana(float amount)
     {
         return currentMana >= amount;
