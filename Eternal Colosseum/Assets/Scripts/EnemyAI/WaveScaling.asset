@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3cc370fe57c02c4ba6075a84fc3dc84, type: 3}
+  m_Name: WaveScaling
+  m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.WaveScalingData
+  EnemyCountBase: 5
+  EnemyCountPerLevel: 0.25
+  EnemyCountMin: 2
+  EnemyCountMax: 12
+  RangedChanceBase: 0.05
+  RangedChancePerLevel: 0.015
+  RangedChanceMin: 0
+  RangedChanceMax: 0.45
+  CelestialChanceBase: 0
+  CelestialChancePerLevel: 0
+  CelestialChanceMin: 0
+  CelestialChanceMax: 0
