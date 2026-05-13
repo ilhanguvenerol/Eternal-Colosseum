@@ -35,6 +35,9 @@ public class EnemyManager : MonoBehaviour
         _all.Clear();
         _all.AddRange(enemies);
 
+        foreach (EnemyBrain b in _all)
+            b.EnemyManager = this;
+
         AssignGuards();
         StartCoroutine(AI_Loop(null));
     }
@@ -144,6 +147,18 @@ public class EnemyManager : MonoBehaviour
         foreach (EnemyBrain b in _all)
             if (b.isActiveAndEnabled) count++;
         return count;
+    }
+
+    /// <summary>
+    /// Returns true if any alive melee enemy is currently guarding the given ranged brain.
+    /// Used by ranged states instead of FindObjectsOfType.
+    /// </summary>
+    public bool HasGuardFor(EnemyBrain ranged)
+    {
+        foreach (EnemyBrain b in _all)
+            if (b.isActiveAndEnabled && b.IsGuarding() && b.guardTarget == ranged)
+                return true;
+        return false;
     }
 
     /// <summary>

@@ -153,6 +153,18 @@ public class EnemyBrain : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(dir);
     }
 
+    // ── Manager reference ────────────────────────────────────────────────────────
+    // Set by EnemyManager during InitialiseWithEnemies so states can query
+    // guard status without using FindObjectsOfType.
+    [HideInInspector] public EnemyManager EnemyManager;
+
+    /// <summary>Returns true if any active melee enemy is guarding this brain.</summary>
+    public bool HasGuardAssigned()
+    {
+        if (EnemyManager == null) return false;
+        return EnemyManager.HasGuardFor(this);
+    }
+
     // ── Manager-called entry points ───────────────────────────────────────────
 
     /// <summary>Called by EnemyManager when this enemy's attack turn arrives.</summary>

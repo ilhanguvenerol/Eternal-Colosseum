@@ -68,18 +68,7 @@ public class LooseState : EnemyState
         // Stand still and fire — attack component reads this state via IsInLoose()
     }
 
-    private bool HasGuard()
-    {
-        // Check if this ranged enemy has an active guard assigned to it.
-        // guardTarget on the guard points back to this brain.
-        EnemyBrain[] all = Object.FindObjectsOfType<EnemyBrain>();
-        foreach (EnemyBrain e in all)
-        {
-            if (e.IsGuarding() && e.guardTarget == brain)
-                return true;
-        }
-        return false;
-    }
+    private bool HasGuard() => brain.HasGuardAssigned();
 }
 
 
@@ -131,15 +120,6 @@ public class DisengageState : EnemyState
         brain.MoveTo(brain.transform.position + awayDir * _safeDistance, brain.disengageSpeed);
     }
 
-    private bool HasGuard()
-    {
-        EnemyBrain[] all = Object.FindObjectsOfType<EnemyBrain>();
-        foreach (EnemyBrain e in all)
-        {
-            if (e.IsGuarding() && e.guardTarget == brain)
-                return true;
-        }
-        return false;
-    }
+    private bool HasGuard() => brain.HasGuardAssigned();
 }
 
