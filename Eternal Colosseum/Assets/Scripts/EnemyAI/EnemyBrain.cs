@@ -190,9 +190,13 @@ public class EnemyBrain : MonoBehaviour
     /// <summary>Called when this enemy takes a hit.</summary>
     public void OnHit()
     {
+        EnemyAnimator?.PlayHit();
         ChangeState(new StunnedState(this));
     }
-
+    public void OnDeath()
+    { 
+        EnemyAnimator.PlayDead();
+    }
     // ── State query helpers (used by EnemyManager) ───────────────────────────
 
     public bool IsIdle()        => _currentState is MeleeIdleState;
