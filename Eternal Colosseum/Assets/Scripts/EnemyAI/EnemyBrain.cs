@@ -8,7 +8,6 @@ public enum EnemyType { Melee, Ranged }
 /// Owns the state machine and exposes shared references to every state.
 /// Attack behaviour lives elsewhere (e.g. a separate EnemyAttack component).
 /// </summary>
-[RequireComponent(typeof(CharacterController))]
 public class EnemyBrain : MonoBehaviour
 {
     // ── Inspector ────────────────────────────────────────────────────────────
