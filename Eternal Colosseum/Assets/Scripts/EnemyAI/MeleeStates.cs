@@ -71,12 +71,16 @@ public class MeleeIdleState : EnemyState
 public class MeleeEngageState : EnemyState
 {
     private const float AbandonMultiplier = 4f;
+    private bool _attackStarted;
 
     public MeleeEngageState(EnemyBrain brain) : base(brain) { }
 
     public override void Enter()
     {
+        _attackStarted = false;
         brain.MoveTo(player.position, brain.engageSpeed);
+
+        brain.EnemyAnimator.OnOneShotComplete += OnAttackFinished;
     }
 
     public override void Update()
@@ -95,11 +99,25 @@ public class MeleeEngageState : EnemyState
         {
             brain.MoveTo(player.position, brain.engageSpeed);
         }
-        else
+        else if (!_attackStarted)
         {
-            // Inside attack distance — stop and let attack component take over
+            // Reached the player — stop and swing
             brain.StopMoving();
+            _attackStarted = true;
+            brain.EnemyAnimator.PlayAttack();
         }
+        // If _attackStarted, just wait for OnAttackFinished
+    }
+    public override void Exit()
+    {
+        // Always unsubscribe on exit — no matter how the state ends
+        brain.EnemyAnimator.OnOneShotComplete -= OnAttackFinished;
+        brain.EnemyAnimator.ExitCombat();
+    }
+    private void OnAttackFinished()
+    {
+        // Animation is done — transition out, manager sees !IsEngaging() and calls BeginRetreat
+        brain.ChangeState(new MeleeIdleState(brain));
     }
 }
 
