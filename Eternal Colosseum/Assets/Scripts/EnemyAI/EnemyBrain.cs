@@ -44,7 +44,7 @@ public class EnemyBrain : MonoBehaviour
 
     public Transform           Player     { get; private set; }
     public NavMeshAgent        Agent      { get; private set; }
-    public Animator            Animator   { get; private set; }
+    public EnemyAnimator       EnemyAnimator   { get; private set; }
 
     // ── Private ───────────────────────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ public class EnemyBrain : MonoBehaviour
     private void Awake()
     {
         Agent = GetComponent<NavMeshAgent>();
-        Animator   = GetComponent<Animator>();
+        EnemyAnimator   = GetComponent<EnemyAnimator>();
 
         // Disable auto-rotation — we handle facing ourselves so enemies
         // always look at the player regardless of movement direction
@@ -68,8 +68,15 @@ public class EnemyBrain : MonoBehaviour
         if (!_initialised) return;
         FacePlayer();
         _currentState?.Update();
+        FeedAnimator();
     }
 
+    private void FeedAnimator()
+    {
+        if (EnemyAnimator == null) return;
+        Vector3 localVel = transform.InverseTransformDirection(Agent.velocity);
+        EnemyAnimator.UpdateMovement(localVel, Agent.velocity.magnitude);
+    }
     // ── Initialisation ────────────────────────────────────────────────────────
 
     /// <summary>
