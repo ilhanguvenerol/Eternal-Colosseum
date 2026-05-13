@@ -99,11 +99,8 @@ public class EnemyManager : MonoBehaviour
 
         attacker.BeginAttackApproach();
 
-        // OPTION B — fixed timeout. Replace with Option A once attack animations are ready.
-        yield return new WaitForSeconds(attackDuration);
-
         // OPTION A — attack component drives retreat. Uncomment when ready:
-        // yield return new WaitUntil(() => !attacker.IsEngaging());
+        yield return new WaitUntil(() => !attacker.IsEngaging());
         // (also remove the attackDuration field and WaitForSeconds above)
 
 
