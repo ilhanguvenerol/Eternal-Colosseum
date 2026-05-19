@@ -51,6 +51,22 @@ public class ShopManager : MonoBehaviour
         return ItemRarity.Epic;
     }
 
+    // Returns a random item matching the rolled rarity
+    private ItemData GetRandomItemByRarity(ItemRarity rarity)
+    {
+        List<ItemData> matchingItems =
+            allAvailableItems.FindAll(item => item.rarity == rarity);
+
+        if (matchingItems.Count == 0)
+        {
+            Debug.LogWarning($"[SHOP] No items found for rarity: {rarity}");
+            return null;
+        }
+
+        int randomIndex = Random.Range(0, matchingItems.Count);
+        return matchingItems[randomIndex];
+    }
+
     // Picks 3 random items from the master list and puts them on the shelf.
     public void RollShopItems()
     {
