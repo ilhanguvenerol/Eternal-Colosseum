@@ -1,4 +1,5 @@
 using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -117,7 +118,7 @@ public class ShopManager : MonoBehaviour
             }
         }
 
-        shopMessageText.text = "Shop rerolled!";
+        shopMessageText.text = "";
 
         shopText.text =
             $"=== SHOP ===\n\n" +
@@ -138,10 +139,16 @@ public class ShopManager : MonoBehaviour
             Inventory.Instance.currentGold -= rerollCost;
             RollShopItems();
             Debug.Log($"[SHOP] Rerolled for {rerollCost}G. Remaining gold: {Inventory.Instance.currentGold}");
+
+            shopMessageText.text = "Shop rerolled!";
+            StartCoroutine(ClearShopMessage());
         }
         else
         {
             Debug.LogWarning("[SHOP] Not enough gold to reroll!");
+
+            shopMessageText.text = "Not enough gold!";
+            StartCoroutine(ClearShopMessage());
         }
     }
 
@@ -154,12 +161,21 @@ public class ShopManager : MonoBehaviour
             Inventory.Instance.currentGold -= selectedItem.price;
 
             shopMessageText.text = $"Purchased: {selectedItem.itemName}!";
+            StartCoroutine(ClearShopMessage());
 
             goldText.text = $"Gold: {Inventory.Instance.currentGold}G";
         }
         else
         {
             shopMessageText.text = "Not enough gold!";
+            StartCoroutine(ClearShopMessage());
         }
+    }
+
+    private IEnumerator ClearShopMessage()
+    {
+        yield return new WaitForSeconds(2f);
+
+        shopMessageText.text = "";
     }
 }
