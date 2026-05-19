@@ -23,6 +23,7 @@ public class ShopManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI shopText;
     [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI shopMessageText;
     [SerializeField] private GameObject shopPanel;
 
     private void Start()
@@ -40,9 +41,25 @@ public class ShopManager : MonoBehaviour
             RerollShop();
         }
 
+        // Press 'T' to toggle the shop panel
         if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
         {
             shopPanel.SetActive(!shopPanel.activeSelf);
+        }
+
+        if (Keyboard.current != null && Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            BuyItem(0);
+        }
+
+        if (Keyboard.current != null && Keyboard.current.digit2Key.wasPressedThisFrame)
+        {
+            BuyItem(1);
+        }
+
+        if (Keyboard.current != null && Keyboard.current.digit3Key.wasPressedThisFrame)
+        {
+            BuyItem(2);
         }
     }
 
@@ -100,16 +117,16 @@ public class ShopManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"[SHOP] Restocked! Shelf has: {currentDisplayItems[0].itemName}, {currentDisplayItems[1].itemName}, {currentDisplayItems[2].itemName}");
+        shopMessageText.text = "Shop rerolled!";
 
         shopText.text =
             $"=== SHOP ===\n\n" +
-            $"{currentDisplayItems[0].itemName} - {currentDisplayItems[0].price}G\n" +
-            $"{currentDisplayItems[1].itemName} - {currentDisplayItems[1].price}G\n" +
-            $"{currentDisplayItems[2].itemName} - {currentDisplayItems[2].price}G\n\n" +
+            $"[1] {currentDisplayItems[0].itemName} - {currentDisplayItems[0].price}G\n" +
+            $"[2] {currentDisplayItems[1].itemName} - {currentDisplayItems[1].price}G\n" +
+            $"[3] {currentDisplayItems[2].itemName} - {currentDisplayItems[2].price}G\n\n" +
             $"Press R to reroll ({rerollCost}G)";
 
-        goldText.text = $"Gold: {Inventory.Instance.currentGold}";
+        goldText.text = $"Gold: {Inventory.Instance.currentGold}G";
     }
 
     
@@ -125,6 +142,24 @@ public class ShopManager : MonoBehaviour
         else
         {
             Debug.LogWarning("[SHOP] Not enough gold to reroll!");
+        }
+    }
+
+    public void BuyItem(int itemIndex)
+    {
+        ItemData selectedItem = currentDisplayItems[itemIndex];
+
+        if (Inventory.Instance.currentGold >= selectedItem.price)
+        {
+            Inventory.Instance.currentGold -= selectedItem.price;
+
+            shopMessageText.text = $"Purchased: {selectedItem.itemName}!";
+
+            goldText.text = $"Gold: {Inventory.Instance.currentGold}G";
+        }
+        else
+        {
+            shopMessageText.text = "Not enough gold!";
         }
     }
 }
