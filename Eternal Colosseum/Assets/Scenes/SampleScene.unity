@@ -904,7 +904,7 @@ MonoBehaviour:
   - {fileID: 211064032}
   - {fileID: 1681393596}
   - {fileID: 1646970937}
-  - {fileID: 1360054861}
+  - {fileID: 0}
   - {fileID: 605658041}
   - {fileID: 739246490}
   - {fileID: 401499259}
@@ -1437,6 +1437,84 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1693212434}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1630081102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1630081104}
+  - component: {fileID: 1630081103}
+  m_Layer: 0
+  m_Name: ShopManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1630081103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1630081102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d2a328c9df0a54f9d08d88fa15a829, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShopManager
+  allAvailableItems:
+  - {fileID: 11400000, guid: e4a21c8b9116abc4592ece67b30cd84d, type: 2}
+  - {fileID: 11400000, guid: 28ee16c5576b97942bb8e0172e916bb1, type: 2}
+  - {fileID: 11400000, guid: ba6872d87d6b403499e259582dd342c1, type: 2}
+  - {fileID: 11400000, guid: e94f7a8889c95bb439a464bb1d34bdc8, type: 2}
+  - {fileID: 11400000, guid: e0a0853a60ba7524da620dddd7d004ed, type: 2}
+  - {fileID: 11400000, guid: 02f8ad2eb34cba8429852d5b6841d110, type: 2}
+  - {fileID: 11400000, guid: 8bcf299ec49c775428ffcb83ec98dcee, type: 2}
+  - {fileID: 11400000, guid: e2d40e7a6c77c4444b89eb5e87a69023, type: 2}
+  - {fileID: 11400000, guid: 9c01cbb60b3a5d644b4f1e862aff5c43, type: 2}
+  - {fileID: 11400000, guid: bd4ab2a7298872a4d85d1bda1e74a8fc, type: 2}
+  - {fileID: 11400000, guid: 27893cc28670c394ea75130efad89afe, type: 2}
+  - {fileID: 11400000, guid: ab612c259560e1544a4cff7e29c66415, type: 2}
+  - {fileID: 11400000, guid: a53a2974f6e6a654da5cc3eba1ea1d31, type: 2}
+  - {fileID: 11400000, guid: d9d965d460a8bc348be16fadf0947061, type: 2}
+  - {fileID: 11400000, guid: 20a0a5ea4d981e942a61d4f3156c971a, type: 2}
+  - {fileID: 11400000, guid: e84f354db855dc743a20f638bcae20fd, type: 2}
+  - {fileID: 11400000, guid: e4bfaba320da93d43960544da83b69ad, type: 2}
+  - {fileID: 11400000, guid: d0681106ab747894bb7af5d6d88e6007, type: 2}
+  - {fileID: 11400000, guid: 6d93e14925b75244c8d5da794fba2207, type: 2}
+  - {fileID: 11400000, guid: e0eaa2b37e67415438be9ce1d95afaab, type: 2}
+  - {fileID: 11400000, guid: ecbe1d3fdd9f3ce47836239965c79a91, type: 2}
+  - {fileID: 11400000, guid: a15f90e84d4bffc4b9f05b12eab230f6, type: 2}
+  - {fileID: 11400000, guid: b6f107a19f935d443b9968254a5e8181, type: 2}
+  - {fileID: 11400000, guid: fadf4c05525f60a4bb16a5fe2f54212c, type: 2}
+  - {fileID: 11400000, guid: 5555ef733b77f17428e928a15cafd02a, type: 2}
+  rerollCost: 20
+  commonChance: 60
+  rareChance: 30
+  epicChance: 10
+  currentDisplayItems:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+--- !u!4 &1630081104
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1630081102}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1646970936
 GameObject:
   m_ObjectHideFlags: 0
@@ -1532,7 +1610,6 @@ Transform:
   - {fileID: 211064032}
   - {fileID: 1681393596}
   - {fileID: 1646970937}
-  - {fileID: 1360054861}
   - {fileID: 605658041}
   - {fileID: 739246490}
   - {fileID: 401499259}
@@ -1915,4 +1992,7 @@ SceneRoots:
   - {fileID: 1468115941}
   - {fileID: 2083520195}
   - {fileID: 1391849136}
-  - {fileID: 1041126090}
+  - {fileID: 865620213}
+  - {fileID: 1693212434}
+  - {fileID: 1818124480}
+  - {fileID: 1630081104}
