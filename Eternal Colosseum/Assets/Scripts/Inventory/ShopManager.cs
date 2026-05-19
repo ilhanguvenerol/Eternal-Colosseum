@@ -1,6 +1,8 @@
+using TMPro;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class ShopManager : MonoBehaviour
 {
@@ -18,8 +20,14 @@ public class ShopManager : MonoBehaviour
     [Header("Current Shop Items")]
     public ItemData[] currentDisplayItems = new ItemData[3]; // The 3 items on the shelf
 
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI shopText;
+    [SerializeField] private TextMeshProUGUI goldText;
+    [SerializeField] private GameObject shopPanel;
+
     private void Start()
     {
+        shopPanel.SetActive(false);
         // Roll the first 3 items when the shop loads
         RollShopItems();
     }
@@ -30,6 +38,11 @@ public class ShopManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
         {
             RerollShop();
+        }
+
+        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            shopPanel.SetActive(!shopPanel.activeSelf);
         }
     }
 
@@ -88,6 +101,15 @@ public class ShopManager : MonoBehaviour
         }
 
         Debug.Log($"[SHOP] Restocked! Shelf has: {currentDisplayItems[0].itemName}, {currentDisplayItems[1].itemName}, {currentDisplayItems[2].itemName}");
+
+        shopText.text =
+            $"=== SHOP ===\n\n" +
+            $"{currentDisplayItems[0].itemName} - {currentDisplayItems[0].price}G\n" +
+            $"{currentDisplayItems[1].itemName} - {currentDisplayItems[1].price}G\n" +
+            $"{currentDisplayItems[2].itemName} - {currentDisplayItems[2].price}G\n\n" +
+            $"Press R to reroll ({rerollCost}G)";
+
+        goldText.text = $"Gold: {Inventory.Instance.currentGold}";
     }
 
     
