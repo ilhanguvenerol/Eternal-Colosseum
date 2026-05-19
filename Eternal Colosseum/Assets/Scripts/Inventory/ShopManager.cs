@@ -33,6 +33,24 @@ public class ShopManager : MonoBehaviour
         }
     }
 
+    // Rolls a rarity based on the configured shop chances
+    private ItemRarity RollRarity()
+    {
+        float roll = Random.Range(0f, 100f);
+
+        if (roll <= commonChance)
+        {
+            return ItemRarity.Common;
+        }
+
+        if (roll <= commonChance + rareChance)
+        {
+            return ItemRarity.Rare;
+        }
+
+        return ItemRarity.Epic;
+    }
+
     // Picks 3 random items from the master list and puts them on the shelf.
     public void RollShopItems()
     {
