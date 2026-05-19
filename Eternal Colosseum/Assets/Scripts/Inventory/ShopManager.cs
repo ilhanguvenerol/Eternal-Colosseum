@@ -76,14 +76,15 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        List<ItemData> tempItems = new List<ItemData>(allAvailableItems);
-
         for (int i = 0; i < currentDisplayItems.Length; i++)
         {
-            // Pick a random item from the master list
-            int randomIndex = Random.Range(0, tempItems.Count);
-            currentDisplayItems[i] = tempItems[randomIndex];
-            tempItems.RemoveAt(randomIndex);
+            ItemRarity rolledRarity = RollRarity();
+            ItemData selectedItem = GetRandomItemByRarity(rolledRarity);
+
+            if (selectedItem != null)
+            {
+                currentDisplayItems[i] = selectedItem;
+            }
         }
 
         Debug.Log($"[SHOP] Restocked! Shelf has: {currentDisplayItems[0].itemName}, {currentDisplayItems[1].itemName}, {currentDisplayItems[2].itemName}");
