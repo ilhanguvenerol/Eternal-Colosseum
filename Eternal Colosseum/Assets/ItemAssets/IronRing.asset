@@ -15,9 +15,9 @@ MonoBehaviour:
   itemName: Iron Ring
   description: 
   icon: {fileID: 0}
+  rarity: 0
   bonusHealth: 0
   bonusSpeed: 5
   bonusDamage: 5
   bonusArmor: 0
-  goldCost: 0
-  rarity: 0
+  price: 55
