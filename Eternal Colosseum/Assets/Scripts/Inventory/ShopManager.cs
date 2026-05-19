@@ -9,6 +9,12 @@ public class ShopManager : MonoBehaviour
     public List<ItemData> allAvailableItems;
     public int rerollCost = 20;
 
+    [Header("Rarity Chances")]
+    // Controls the chance of each rarity appearing in the shop
+    [SerializeField] private float commonChance = 60f;
+    [SerializeField] private float rareChance = 30f;
+    [SerializeField] private float epicChance = 10f;
+
     [Header("Current Shop Items")]
     public ItemData[] currentDisplayItems = new ItemData[3]; // The 3 items on the shelf
 
