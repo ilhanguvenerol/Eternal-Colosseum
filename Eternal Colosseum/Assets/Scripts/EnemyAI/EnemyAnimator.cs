@@ -58,10 +58,8 @@ using UnityEngine;
 public class EnemyAnimator : MonoBehaviour
 {
     // ── Parameter hashes ──────────────────────────────────────────────────────
-    private static readonly int InputMagnitudeHash = Animator.StringToHash("InputMagnitude");
-    private static readonly int StrafeDirectionHash = Animator.StringToHash("StrafeDirection");
-    private static readonly int ForwardDirectionHash = Animator.StringToHash("ForwardDirection");
-    private static readonly int StrafeHash = Animator.StringToHash("Strafe");
+    private static readonly int VelocityXHash = Animator.StringToHash("VelocityX");
+    private static readonly int VelocityZHash = Animator.StringToHash("VelocityZ");
     private static readonly int PunchHash = Animator.StringToHash("Punch");
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DeathHash = Animator.StringToHash("Death");
@@ -96,13 +94,11 @@ public class EnemyAnimator : MonoBehaviour
     /// strafeDir  : signed -1..+1 derived from local velocity X
     /// isStrafing : true while orbiting (MeleeIdleState), false otherwise
     /// </summary>
-    public void UpdateMovement(float speed, float strafeDir, float forwardDir, bool isStrafing)
+    public void UpdateMovement(float velocityX, float velocityZ)
     {
         if (_dead) return;
-        _animator.SetFloat(InputMagnitudeHash, speed, 0.1f, Time.deltaTime);
-        _animator.SetFloat(StrafeDirectionHash, strafeDir, 0.1f, Time.deltaTime);
-        _animator.SetFloat(ForwardDirectionHash, forwardDir, 0.1f, Time.deltaTime);
-        _animator.SetBool(StrafeHash, isStrafing);
+        _animator.SetFloat(VelocityXHash, velocityX, 0.1f, Time.deltaTime);
+        _animator.SetFloat(VelocityZHash, velocityZ, 0.1f, Time.deltaTime);
     }
 
     // ── Combat API ────────────────────────────────────────────────────────────
