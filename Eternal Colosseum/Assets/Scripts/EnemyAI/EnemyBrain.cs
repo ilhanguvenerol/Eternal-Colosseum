@@ -195,7 +195,7 @@ public class EnemyBrain : MonoBehaviour
         // Derive signed strafe direction from local horizontal velocity.
         // Positive = strafing right, negative = strafing left.
         float strafeDir = speed > 0.05f ? Mathf.Clamp(localVel.x / speed, -1f, 1f) : 0f;
-
-        EnemyAnimator.UpdateMovement(speed, strafeDir, IsStrafing);
+        float forwardDir = speed > 0.05f ? Mathf.Clamp(localVel.z / speed, -1f, 1f) : 0f;
+        EnemyAnimator.UpdateMovement(speed, strafeDir, forwardDir, IsStrafing);
     }
 }
