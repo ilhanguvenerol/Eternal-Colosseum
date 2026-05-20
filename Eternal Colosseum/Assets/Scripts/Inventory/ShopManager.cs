@@ -22,7 +22,15 @@ public class ShopManager : MonoBehaviour
     public ItemData[] currentDisplayItems = new ItemData[3]; // The 3 items on the shelf
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI shopText;
+    [SerializeField] private TextMeshProUGUI itemName1;
+    [SerializeField] private TextMeshProUGUI itemStats1;
+    [SerializeField] private TextMeshProUGUI itemPrice1;
+    [SerializeField] private TextMeshProUGUI itemName2;
+    [SerializeField] private TextMeshProUGUI itemStats2;
+    [SerializeField] private TextMeshProUGUI itemPrice2;
+    [SerializeField] private TextMeshProUGUI itemName3;
+    [SerializeField] private TextMeshProUGUI itemStats3;
+    [SerializeField] private TextMeshProUGUI itemPrice3;
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI shopMessageText;
     [SerializeField] private GameObject shopPanel;
@@ -128,15 +136,17 @@ public class ShopManager : MonoBehaviour
 
         shopMessageText.text = "";
 
-        shopText.text =
-            $"=== SHOP ===\n\n" +
-            $"[1] {currentDisplayItems[0].itemName} - {currentDisplayItems[0].price}G\n" +
-            $"{GetItemStats(currentDisplayItems[0])}\n\n" +
-            $"[2] {currentDisplayItems[1].itemName} - {currentDisplayItems[1].price}G\n" +
-            $"{GetItemStats(currentDisplayItems[1])}\n\n" +
-            $"[3] {currentDisplayItems[2].itemName} - {currentDisplayItems[2].price}G\n" +
-            $"{GetItemStats(currentDisplayItems[2])}\n\n" +
-            $"Press R to reroll ({rerollCost}G)";
+        itemName1.text = currentDisplayItems[0].itemName;
+        itemStats1.text = GetItemStats(currentDisplayItems[0]);
+        itemPrice1.text = $"{currentDisplayItems[0].price}G";
+
+        itemName2.text = currentDisplayItems[1].itemName;
+        itemStats2.text = GetItemStats(currentDisplayItems[1]);
+        itemPrice2.text = $"{currentDisplayItems[1].price}G";
+
+        itemName3.text = currentDisplayItems[2].itemName;
+        itemStats3.text = GetItemStats(currentDisplayItems[2]);
+        itemPrice3.text = $"{currentDisplayItems[2].price}G";
 
         goldText.text = $"Gold: {Inventory.Instance.currentGold}G";
     }
