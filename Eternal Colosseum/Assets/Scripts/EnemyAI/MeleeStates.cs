@@ -22,7 +22,6 @@ public class MeleeIdleState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Idle;
-        brain.IsStrafing = true;  // tells animator to use StrafeBlend tree
 
         Vector3 toSelf = brain.transform.position - player.position;
         toSelf.y = 0f;
@@ -39,12 +38,9 @@ public class MeleeIdleState : EnemyState
         // Player ran away — chase to close the gap, then resume orbiting.
         if (dist > brain.engageStopDistance * ChaseMultiplier)
         {
-            brain.IsStrafing = false;
             brain.MoveTo(player.position, brain.engageSpeed);
             return;
         }
-
-        brain.IsStrafing = true;
 
         _driftTimer -= Time.deltaTime;
         if (_driftTimer <= 0f)
@@ -59,7 +55,6 @@ public class MeleeIdleState : EnemyState
 
     public override void Exit()
     {
-        brain.IsStrafing = false;
         brain.StopMoving();
     }
 }
@@ -86,7 +81,6 @@ public class MeleeEngageState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Engaging;
-        brain.IsStrafing = false;
         _attackStarted = false;
 
         brain.EnemyAnimator.OnPunchComplete += OnPunchFinished;
@@ -149,7 +143,6 @@ public class MeleeRetreatState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Retreating;
-        brain.IsStrafing = false;
         SetRetreatDestination();
     }
 
@@ -189,7 +182,6 @@ public class GuardState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Guarding;
-        brain.IsStrafing = false;
     }
 
     public override void Update()
@@ -234,7 +226,6 @@ public class StunnedState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Stunned;
-        brain.IsStrafing = false;
         brain.StopMoving();
 
         brain.EnemyAnimator.OnHitComplete += OnHitAnimationFinished;
