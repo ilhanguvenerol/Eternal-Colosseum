@@ -2,17 +2,16 @@ using UnityEngine;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELEE IDLE
-// Replicates the Arkham strafe: random orbit direction, re-rolled every second.
-// This is what produces emergent flanking and support behaviour without
-// needing explicit Flank / Support states.
+// Orbits the player using the Arkham strafe pattern.
+// Sets brain.IsStrafing = true so EnemyBrain.FeedAnimator pushes the
+// StrafeBlend tree — the animator plays left/right strafe clips.
 // ─────────────────────────────────────────────────────────────────────────────
 public class MeleeIdleState : EnemyState
 {
-    // Orbit radius matches engageStopDistance so the ring sits just outside attack range
     private const float OrbitRadiusMultiplier = 1.4f;
     private const float ChaseMultiplier = 3f;
-    private const float AngleDriftSpeed = 0.4f;  // radians per second
-    private const float AngleDriftInterval = 1.2f;  // seconds before drift direction re-rolls
+    private const float AngleDriftSpeed = 0.4f;
+    private const float AngleDriftInterval = 1.2f;
 
     private float _angle;
     private float _driftSign;
@@ -22,8 +21,9 @@ public class MeleeIdleState : EnemyState
 
     public override void Enter()
     {
-        // Start at the angle closest to current position so there's no
-        // sudden jump when entering this state
+        brain.Phase = EnemyPhase.Idle;
+        brain.IsStrafing = true;  // tells animator to use StrafeBlend tree
+
         Vector3 toSelf = brain.transform.position - player.position;
         toSelf.y = 0f;
         _angle = Mathf.Atan2(toSelf.z, toSelf.x);
@@ -36,14 +36,16 @@ public class MeleeIdleState : EnemyState
         float dist = brain.DistanceToPlayer();
         float radius = brain.engageStopDistance * OrbitRadiusMultiplier;
 
-        // Player ran away — chase to close the gap, then resume orbiting
+        // Player ran away — chase to close the gap, then resume orbiting.
         if (dist > brain.engageStopDistance * ChaseMultiplier)
         {
+            brain.IsStrafing = false;
             brain.MoveTo(player.position, brain.engageSpeed);
             return;
         }
 
-        // Drift angle
+        brain.IsStrafing = true;
+
         _driftTimer -= Time.deltaTime;
         if (_driftTimer <= 0f)
         {
@@ -52,12 +54,12 @@ public class MeleeIdleState : EnemyState
         }
 
         _angle += _driftSign * AngleDriftSpeed * Time.deltaTime;
-
         brain.MoveTo(brain.OrbitPosition(_angle, radius), brain.orbitSpeed);
     }
 
     public override void Exit()
     {
+        brain.IsStrafing = false;
         brain.StopMoving();
     }
 }
@@ -65,67 +67,80 @@ public class MeleeIdleState : EnemyState
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELEE ENGAGE
-// Moves straight toward the player. EnemyManager is responsible for calling
-// BeginAttackApproach(); attack logic itself is handled outside this file.
+// Moves toward the player. When inside attack range, plays the punch animation
+// and waits for AnimEvent_PunchComplete before transitioning out.
+//
+// Subscribes to OnPunchComplete in Enter() and unsubscribes in Exit() so the
+// callback is scoped only to this enemy while it is actively engaging.
+// The animator's own exit-time transition (Punch → StrafeBlend) is the
+// visual gate — OnPunchComplete fires from AnimEvent at that same moment.
 // ─────────────────────────────────────────────────────────────────────────────
 public class MeleeEngageState : EnemyState
 {
     private const float AbandonMultiplier = 4f;
+
     private bool _attackStarted;
 
     public MeleeEngageState(EnemyBrain brain) : base(brain) { }
 
     public override void Enter()
     {
+        brain.Phase = EnemyPhase.Engaging;
+        brain.IsStrafing = false;
         _attackStarted = false;
-        brain.MoveTo(player.position, brain.engageSpeed);
 
-        brain.EnemyAnimator.OnOneShotComplete += OnAttackFinished;
+        brain.EnemyAnimator.OnPunchComplete += OnPunchFinished;
+        brain.MoveTo(player.position, brain.engageSpeed);
     }
 
     public override void Update()
     {
+        // Already swinging — wait for the animation event.
+        if (_attackStarted) return;
+
         float dist = brain.DistanceToPlayer();
 
-        // Player ran far enough away — give up and return to orbit
+        // Player ran far away — abandon approach and return to orbit.
         if (dist > brain.engageStopDistance * AbandonMultiplier)
         {
             brain.ChangeState(new MeleeIdleState(brain));
             return;
         }
 
-        // Keep destination current as the player moves
         if (dist > brain.engageStopDistance)
         {
             brain.MoveTo(player.position, brain.engageSpeed);
         }
-        else if (!_attackStarted)
+        else
         {
-            // Reached the player — stop and swing
+            // In range — stop and swing.
             brain.StopMoving();
             _attackStarted = true;
-            brain.EnemyAnimator.PlayAttack();
+            brain.EnemyAnimator.PlayPunch();
         }
-        // If _attackStarted, just wait for OnAttackFinished
     }
+
     public override void Exit()
     {
-        // Always unsubscribe on exit — no matter how the state ends
-        brain.EnemyAnimator.OnOneShotComplete -= OnAttackFinished;
-        brain.EnemyAnimator.ExitCombat();
+        // Always unsubscribe regardless of how the state exits
+        // (abandon, stun interrupt, death).
+        brain.EnemyAnimator.OnPunchComplete -= OnPunchFinished;
     }
-    private void OnAttackFinished()
+
+    private void OnPunchFinished()
     {
-        // Animation is done — transition out, manager sees !IsEngaging() and calls BeginRetreat
+        // Punch animation done — leave Engaging so EnemyManager
+        // sees Phase != Engaging and sends the retreat signal.
         brain.ChangeState(new MeleeIdleState(brain));
     }
 }
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // MELEE RETREAT
-    // Backs away until past a safe distance, then returns to idle orbiting.
-    // ─────────────────────────────────────────────────────────────────────────────
-    public class MeleeRetreatState : EnemyState
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MELEE RETREAT
+// Backs away until past a safe distance, then returns to idle orbiting.
+// ─────────────────────────────────────────────────────────────────────────────
+public class MeleeRetreatState : EnemyState
 {
     private const float RetreatDistance = 4.5f;
 
@@ -133,6 +148,8 @@ public class MeleeEngageState : EnemyState
 
     public override void Enter()
     {
+        brain.Phase = EnemyPhase.Retreating;
+        brain.IsStrafing = false;
         SetRetreatDestination();
     }
 
@@ -143,8 +160,6 @@ public class MeleeEngageState : EnemyState
             brain.ChangeState(new MeleeIdleState(brain));
             return;
         }
-
-        // Refresh destination each frame so it tracks away from a moving player
         SetRetreatDestination();
     }
 
@@ -159,25 +174,28 @@ public class MeleeEngageState : EnemyState
         Vector3 retreatTo = brain.transform.position + awayDir * RetreatDistance;
         brain.MoveTo(retreatTo, brain.retreatSpeed);
     }
-
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GUARD
-// Positions the melee enemy between the player and the ranged enemy it protects.
-// The goal position is on the player→rangedEnemy segment, offset toward the
-// ranged enemy by guardOffset. Re-evaluates every frame so it tracks both.
-// Transitions back to MeleeIdleState if the ranged enemy dies.
+// Positions the melee enemy between the player and its assigned ranged enemy.
+// Releases back to idle if the ranged enemy dies.
 // ─────────────────────────────────────────────────────────────────────────────
 public class GuardState : EnemyState
 {
     public GuardState(EnemyBrain brain) : base(brain) { }
 
+    public override void Enter()
+    {
+        brain.Phase = EnemyPhase.Guarding;
+        brain.IsStrafing = false;
+    }
+
     public override void Update()
     {
         EnemyBrain ranged = brain.guardTarget;
 
-        // If the ranged enemy we were guarding is gone, return to orbit
         if (ranged == null || !ranged.isActiveAndEnabled)
         {
             brain.guardTarget = null;
@@ -185,45 +203,50 @@ public class GuardState : EnemyState
             return;
         }
 
-        // Goal: the point on the line from player to ranged enemy,
-        // sitting guardOffset units away from the ranged enemy's position.
-        Vector3 toRanged    = (ranged.transform.position - player.position).normalized;
+        Vector3 toRanged = (ranged.transform.position - player.position).normalized;
         Vector3 goalPosition = ranged.transform.position - toRanged * brain.guardOffset;
 
-        Vector3 dir  = (goalPosition - brain.transform.position);
-        float   dist = dir.magnitude;
-
-        // Only move if not already close enough to the goal
-        if (dist > 0.3f)
+        if ((goalPosition - brain.transform.position).magnitude > 0.3f)
             brain.MoveTo(goalPosition, brain.guardSpeed);
     }
 }
 
+
 // ─────────────────────────────────────────────────────────────────────────────
 // STUNNED
-// Freezes movement briefly after a hit. Returns to idle when done.
+// Freezes movement after a hit and waits for the Hit animation to finish
+// via the AnimEvent_HitComplete callback — stun duration matches clip length
+// exactly, no hardcoded timer needed.
+//
+// Subscribes to OnHitComplete in Enter() and unsubscribes in Exit().
+// The resume state is injected via constructor so this class has no
+// knowledge of EnemyType.
 // ─────────────────────────────────────────────────────────────────────────────
 public class StunnedState : EnemyState
 {
-    private const float StunDuration = 0.5f;
-    private float _timer;
+    private readonly EnemyState _resumeState;
 
-    public StunnedState(EnemyBrain brain) : base(brain) { }
+    public StunnedState(EnemyBrain brain, EnemyState resumeState) : base(brain)
+    {
+        _resumeState = resumeState;
+    }
 
     public override void Enter()
     {
-        _timer = StunDuration;
+        brain.Phase = EnemyPhase.Stunned;
+        brain.IsStrafing = false;
+        brain.StopMoving();
+
+        brain.EnemyAnimator.OnHitComplete += OnHitAnimationFinished;
     }
 
-    public override void Update()
+    public override void Exit()
     {
-        _timer -= Time.deltaTime;
-        if (_timer <= 0f)
-        {
-            if (brain.enemyType == EnemyType.Melee)
-                brain.ChangeState(new MeleeIdleState(brain));
-            else
-                brain.ChangeState(new RangedEngageState(brain));
-        }
+        brain.EnemyAnimator.OnHitComplete -= OnHitAnimationFinished;
+    }
+
+    private void OnHitAnimationFinished()
+    {
+        brain.ChangeState(_resumeState);
     }
 }
