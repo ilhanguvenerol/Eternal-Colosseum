@@ -64,14 +64,6 @@ public class EnemyBrain : MonoBehaviour
 
     [HideInInspector] public EnemyManager EnemyManager;
 
-    // ── Animator feed hints (set by states each frame) ────────────────────────
-
-    /// <summary>True while orbiting — tells animator to use StrafeBlend tree.</summary>
-    public bool IsStrafing { get; set; } = false;
-
-    /// <summary>Signed left/right value for StrafeBlend tree (-1 to +1).</summary>
-    public float StrafeDir { get; set; } = 0f;
-
     // ── Private ───────────────────────────────────────────────────────────────
 
     private EnemyState _currentState;
@@ -188,14 +180,7 @@ public class EnemyBrain : MonoBehaviour
     private void FeedAnimator()
     {
         if (EnemyAnimator == null) return;
-
-        float speed = Agent.velocity.magnitude;
         Vector3 localVel = transform.InverseTransformDirection(Agent.velocity);
-
-        // Derive signed strafe direction from local horizontal velocity.
-        // Positive = strafing right, negative = strafing left.
-        float strafeDir = speed > 0.05f ? Mathf.Clamp(localVel.x / speed, -1f, 1f) : 0f;
-        float forwardDir = speed > 0.05f ? Mathf.Clamp(localVel.z / speed, -1f, 1f) : 0f;
-        EnemyAnimator.UpdateMovement(speed, strafeDir, forwardDir, IsStrafing);
+        EnemyAnimator.UpdateMovement(localVel.x, localVel.z);
     }
 }
