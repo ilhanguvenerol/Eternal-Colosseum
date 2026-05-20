@@ -156,10 +156,10 @@ public class ShopManager : MonoBehaviour
     {
         ItemData selectedItem = currentDisplayItems[itemIndex];
 
-        if (Inventory.Instance.currentGold >= selectedItem.price)
-        {
-            Inventory.Instance.currentGold -= selectedItem.price;
+        bool purchaseSuccessful = Inventory.Instance.BuyItem(selectedItem);
 
+        if (purchaseSuccessful)
+        {
             shopMessageText.text = $"Purchased: {selectedItem.itemName}!";
             StartCoroutine(ClearShopMessage());
 
