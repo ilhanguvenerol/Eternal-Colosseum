@@ -123,11 +123,34 @@ public class ShopManager : MonoBehaviour
         shopText.text =
             $"=== SHOP ===\n\n" +
             $"[1] {currentDisplayItems[0].itemName} - {currentDisplayItems[0].price}G\n" +
+            $"{GetItemStats(currentDisplayItems[0])}\n\n" +
             $"[2] {currentDisplayItems[1].itemName} - {currentDisplayItems[1].price}G\n" +
-            $"[3] {currentDisplayItems[2].itemName} - {currentDisplayItems[2].price}G\n\n" +
+            $"{GetItemStats(currentDisplayItems[1])}\n\n" +
+            $"[3] {currentDisplayItems[2].itemName} - {currentDisplayItems[2].price}G\n" +
+            $"{GetItemStats(currentDisplayItems[2])}\n\n" +
             $"Press R to reroll ({rerollCost}G)";
 
         goldText.text = $"Gold: {Inventory.Instance.currentGold}G";
+    }
+
+    // Creates the bonus stat text shown under shop items
+    private string GetItemStats(ItemData item)
+    {
+        string stats = "";
+
+        if (item.bonusHealth > 0)
+            stats += $"+{item.bonusHealth} HP ";
+
+        if (item.bonusDamage > 0)
+            stats += $"+{item.bonusDamage} DMG ";
+
+        if (item.bonusArmor > 0)
+            stats += $"+{item.bonusArmor} Armor ";
+
+        if (item.bonusSpeed > 0)
+            stats += $"+{item.bonusSpeed} Speed ";
+
+        return stats;
     }
 
     
