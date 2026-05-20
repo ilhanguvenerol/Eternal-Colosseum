@@ -8,7 +8,7 @@ using UnityEngine;
 // ─────────────────────────────────────────────────────────────────────────────
 public class MeleeIdleState : EnemyState
 {
-    private const float OrbitRadiusMultiplier = 1.4f;
+    private const float OrbitRadiusMultiplier = 2.5f;
     private const float ChaseMultiplier = 3f;
     private const float AngleDriftSpeed = 0.4f;
     private const float AngleDriftInterval = 1.2f;
