@@ -107,14 +107,22 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
+        List<ItemData> selectedItems = new List<ItemData>();
+
         for (int i = 0; i < currentDisplayItems.Length; i++)
         {
             ItemRarity rolledRarity = RollRarity();
             ItemData selectedItem = GetRandomItemByRarity(rolledRarity);
 
+            while (selectedItems.Contains(selectedItem))
+            {
+                selectedItem = GetRandomItemByRarity(rolledRarity);
+            }
+
             if (selectedItem != null)
             {
                 currentDisplayItems[i] = selectedItem;
+                selectedItems.Add(selectedItem);
             }
         }
 
