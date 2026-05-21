@@ -896,7 +896,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cd6b0fc29d33247a49b8fd05e08bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.SpawnManager
-  MeleePrefab: {fileID: 1859766477297938151, guid: a43762024db85c345a6584145fd2330b, type: 3}
+  MeleePrefab: {fileID: 6018979999398995438, guid: e9812a9ef01e67748867d9a6431ff32f, type: 3}
   RangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
   CelestialMeleePrefab: {fileID: 1859766477297938151, guid: a43762024db85c345a6584145fd2330b, type: 3}
   CelestialRangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
@@ -904,7 +904,7 @@ MonoBehaviour:
   - {fileID: 211064032}
   - {fileID: 1681393596}
   - {fileID: 1646970937}
-  - {fileID: 1360054861}
+  - {fileID: 2112709248}
   - {fileID: 605658041}
   - {fileID: 739246490}
   - {fileID: 401499259}
@@ -1532,7 +1532,7 @@ Transform:
   - {fileID: 211064032}
   - {fileID: 1681393596}
   - {fileID: 1646970937}
-  - {fileID: 1360054861}
+  - {fileID: 2112709248}
   - {fileID: 605658041}
   - {fileID: 739246490}
   - {fileID: 401499259}
@@ -1902,6 +1902,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StarterEquipment
   starterSword: {fileID: 11400000, guid: 0a435dd1d3133204798e10222c1fde13, type: 2}
+--- !u!1 &2112709247
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2112709248}
+  m_Layer: 0
+  m_Name: SpawnPoint (4)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2112709248
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112709247}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -16.4, y: 1.72, z: 13.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1693212434}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1915,4 +1946,6 @@ SceneRoots:
   - {fileID: 1468115941}
   - {fileID: 2083520195}
   - {fileID: 1391849136}
-  - {fileID: 1041126090}
+  - {fileID: 865620213}
+  - {fileID: 1693212434}
+  - {fileID: 1818124480}
