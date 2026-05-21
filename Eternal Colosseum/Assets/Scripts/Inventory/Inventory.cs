@@ -39,6 +39,12 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        ClearInventory();
+        currentGold = 100;
+    }
+
     public void AddItem(ItemData item)
     {
         ownedItems.Add(item);

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 245dd3990c7503744831e483e8322631, type: 3}
   m_Name: Personal Shield Generator
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Personal Shield Generator
+  itemName: Shield Generator
   description: 
   icon: {fileID: 0}
   rarity: 0
