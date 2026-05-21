@@ -1570,7 +1570,7 @@ ModelImporter:
       curves: []
       events:
       - time: 0.9912807
-        functionName: AnimEvent_OneShotComplete
+        functionName: AnimEvent_HitComplete
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -3600,7 +3600,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

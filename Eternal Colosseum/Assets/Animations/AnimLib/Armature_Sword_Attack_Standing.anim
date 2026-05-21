@@ -42613,8 +42613,8 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.5333333
-    functionName: AnimEvent_OneShotComplete
+  - time: 1.5
+    functionName: AnimEvent_PunchComplete
     data: 
     objectReferenceParameter: {fileID: 11500000, guid: f4b46da4418fa1b4eacbaf769f74592b, type: 3}
     floatParameter: 0
