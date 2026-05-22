@@ -2,13 +2,21 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public enum EnemyType { Melee, Ranged }
+public enum EnemyPhase { Idle, Engaging, Retreating, Guarding, Stunned }
 
 /// <summary>
-/// Replaces EnemyScript's movement responsibility.
-/// Owns the state machine and exposes shared references to every state.
-/// Attack behaviour lives elsewhere (e.g. a separate EnemyAttack component).
+/// Owns the NavMeshAgent, state machine, and animator feed for one enemy.
+///
+/// Key changes from previous version:
+///   - EnemyAnimator is now single-layer (reference architecture).
+///     FeedAnimator passes speed, strafeDir, and isStrafing flag so the
+///     animator can switch between WalkBlend and StrafeBlend trees.
+///   - StunnedState duration is driven by AnimEvent_HitComplete callback
+///     so stun length always matches the actual clip length.
+///   - Phase enum replaces all Is*() type-check methods.
+///   - No wrapper entry-point methods — EnemyManager calls ChangeState directly.
+///   - OnDeath disables further state updates cleanly.
 /// </summary>
-[RequireComponent(typeof(CharacterController))]
 public class EnemyBrain : MonoBehaviour
 {
     // ── Inspector ────────────────────────────────────────────────────────────
@@ -20,46 +28,53 @@ public class EnemyBrain : MonoBehaviour
     public bool IsCelestial = false;
 
     [Header("Movement Speeds")]
-    public float engageSpeed    = 5f;
-    public float orbitSpeed     = 1.5f;
-    public float retreatSpeed   = 2f;
-    public float guardSpeed     = 3f;
+    public float engageSpeed = 5f;
+    public float orbitSpeed = 1.5f;
+    public float retreatSpeed = 2f;
+    public float guardSpeed = 3f;
     public float disengageSpeed = 4f;
 
     [Header("Distances")]
-    public float engageStopDistance   = 2f;   // melee: stop attacking distance
-    public float rangedFireDistance   = 10f;  // ranged: open fire inside this
-    public float disengageThreshold   = 3f;   // ranged: flee if player is closer
-    public float guardOffset          = 1.2f; // how close guard sits to the ranged enemy
+    public float engageStopDistance = 2f;
+    public float rangedFireDistance = 10f;
+    public float disengageThreshold = 3f;
+    public float guardOffset = 1.2f;
 
-    // ── Runtime state (read-only from states) ────────────────────────────────
+    // ── Phase ─────────────────────────────────────────────────────────────────
 
-    [Header("Debug — current state")]
+    /// <summary>Set by each state in Enter(). Read by EnemyManager.</summary>
+    public EnemyPhase Phase { get; set; } = EnemyPhase.Idle;
+
+    // ── Debug ─────────────────────────────────────────────────────────────────
+
+    [Header("Debug")]
     [SerializeField] private string currentStateName;
 
-    /// <summary>The ranged enemy this melee Guard is protecting. Null if not guarding.</summary>
+    // ── Guard target ──────────────────────────────────────────────────────────
+
     [HideInInspector] public EnemyBrain guardTarget;
 
     // ── Shared components ─────────────────────────────────────────────────────
 
-    public Transform           Player     { get; private set; }
-    public NavMeshAgent        Agent      { get; private set; }
-    public Animator            Animator   { get; private set; }
+    public Transform Player { get; private set; }
+    public NavMeshAgent Agent { get; private set; }
+    public EnemyAnimator EnemyAnimator { get; private set; }
+
+    // ── Manager reference ─────────────────────────────────────────────────────
+
+    [HideInInspector] public EnemyManager EnemyManager;
 
     // ── Private ───────────────────────────────────────────────────────────────
 
     private EnemyState _currentState;
-    private bool       _initialised;
+    private bool _initialised;
 
     // ── Unity ─────────────────────────────────────────────────────────────────
 
     private void Awake()
     {
         Agent = GetComponent<NavMeshAgent>();
-        Animator   = GetComponent<Animator>();
-
-        // Disable auto-rotation — we handle facing ourselves so enemies
-        // always look at the player regardless of movement direction
+        EnemyAnimator = GetComponent<EnemyAnimator>();
         Agent.updateRotation = false;
     }
 
@@ -68,17 +83,15 @@ public class EnemyBrain : MonoBehaviour
         if (!_initialised) return;
         FacePlayer();
         _currentState?.Update();
+        FeedAnimator();
     }
 
     // ── Initialisation ────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Called by SpawnManager immediately after instantiation.
-    /// Boots the state machine once the player reference is available.
-    /// </summary>
+    /// <summary>Called by SpawnManager immediately after instantiation.</summary>
     public void SetPlayer(Transform player)
     {
-        Player       = player;
+        Player = player;
         _initialised = true;
 
         if (enemyType == EnemyType.Melee)
@@ -86,6 +99,8 @@ public class EnemyBrain : MonoBehaviour
         else
             ChangeState(new RangedEngageState(this));
     }
+
+    // ── State machine ─────────────────────────────────────────────────────────
 
     public void ChangeState(EnemyState newState)
     {
@@ -95,12 +110,8 @@ public class EnemyBrain : MonoBehaviour
         _currentState.Enter();
     }
 
-    // ── Movement API (used by states) ─────────────────────────────────────────
+    // ── Movement API ──────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Set NavMesh destination and speed in one call.
-    /// States call this instead of manipulating the agent directly.
-    /// </summary>
     public void MoveTo(Vector3 worldPosition, float speed)
     {
         Agent.isStopped = false;
@@ -108,35 +119,55 @@ public class EnemyBrain : MonoBehaviour
         Agent.SetDestination(worldPosition);
     }
 
-    /// <summary>Stop the agent in place.</summary>
     public void StopMoving()
     {
         Agent.isStopped = true;
         Agent.ResetPath();
     }
 
-
-    // ── Helpers used by multiple states ──────────────────────────────────────
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     public float DistanceToPlayer()
         => Player != null
             ? Vector3.Distance(transform.position, Player.position)
             : float.MaxValue;
 
-    /// <summary>
-    /// World position on a circle of radius r around the player,
-    /// at the given angle in radians.
-    /// </summary>
     public Vector3 OrbitPosition(float angleRad, float radius)
-    {
-        return Player.position + new Vector3(
+        => Player.position + new Vector3(
             Mathf.Cos(angleRad) * radius,
             0f,
             Mathf.Sin(angleRad) * radius);
+
+    public bool HasGuardAssigned()
+        => EnemyManager != null && EnemyManager.HasGuardFor(this);
+
+    // ── Damage entry points ───────────────────────────────────────────────────
+
+    /// <summary>Called by the damage/combat component when this enemy is hit.</summary>
+    public void OnHit()
+    {
+        EnemyAnimator?.PlayHit();
+
+        EnemyState resumeState = enemyType == EnemyType.Melee
+            ? (EnemyState)new MeleeIdleState(this)
+            : (EnemyState)new RangedEngageState(this);
+
+        ChangeState(new StunnedState(this, resumeState));
     }
+
+    /// <summary>Called by the damage/combat component when this enemy dies.</summary>
+    public void OnDeath()
+    {
+        _initialised = false; // stop state updates immediately
+        StopMoving();
+        EnemyAnimator?.PlayDeath();
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
 
     private void FacePlayer()
     {
+        if (Player == null) return;
         Vector3 dir = new Vector3(
             Player.position.x - transform.position.x,
             0f,
@@ -146,40 +177,10 @@ public class EnemyBrain : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    // ── Manager-called entry points ───────────────────────────────────────────
-
-    /// <summary>Called by EnemyManager when this enemy's attack turn arrives.</summary>
-    public void BeginAttackApproach()
+    private void FeedAnimator()
     {
-        if (enemyType == EnemyType.Melee)
-            ChangeState(new MeleeEngageState(this));
+        if (EnemyAnimator == null) return;
+        Vector3 localVel = transform.InverseTransformDirection(Agent.velocity);
+        EnemyAnimator.UpdateMovement(localVel.x, localVel.z);
     }
-
-    /// <summary>Called by EnemyManager after the attack resolves.</summary>
-    public void BeginRetreat()
-    {
-        if (enemyType == EnemyType.Melee)
-            ChangeState(new MeleeRetreatState(this));
-    }
-
-    /// <summary>Called by EnemyManager to assign guard duty over a ranged enemy.</summary>
-    public void AssignGuard(EnemyBrain rangedEnemy)
-    {
-        guardTarget = rangedEnemy;
-        ChangeState(new GuardState(this));
-    }
-
-    /// <summary>Called when this enemy takes a hit.</summary>
-    public void OnHit()
-    {
-        ChangeState(new StunnedState(this));
-    }
-
-    // ── State query helpers (used by EnemyManager) ───────────────────────────
-
-    public bool IsIdle()        => _currentState is MeleeIdleState;
-    public bool IsRetreating()  => _currentState is MeleeRetreatState;
-    public bool IsStunned()     => _currentState is StunnedState;
-    public bool IsGuarding()    => _currentState is GuardState;
-    public bool IsEngaging()    => _currentState is MeleeEngageState;
 }

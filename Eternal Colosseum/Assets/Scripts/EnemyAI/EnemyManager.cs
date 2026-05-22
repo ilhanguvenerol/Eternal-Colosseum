@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Orchestrates which enemy attacks when, using the same coroutine-based
-/// turn-taking loop from the Arkham reference — adapted for EnemyBrain.
-/// Also assigns Guard duty at fight start when ranged enemies are present.
+/// Orchestrates sequential melee turn-taking and guard assignment.
+///
+/// Reads brain.Phase instead of Is*() type checks.
+/// Calls brain.ChangeState() directly — no wrapper entry-point methods.
+///
+/// All four loop bugs from the original are fixed:
+///   1. Attacker dying mid-engage no longer calls ChangeState on a dead object.
+///   2. WaitUntil readiness check escapes if the picked enemy dies while waiting.
+///   3. Retreat is skipped when the enemy already self-transitioned out of Engage.
+///   4. All-guards softlock: guards are released when no free attacker exists.
 /// </summary>
 public class EnemyManager : MonoBehaviour
 {
@@ -13,38 +20,62 @@ public class EnemyManager : MonoBehaviour
     [SerializeField] private float minTurnDelay = 0.5f;
     [SerializeField] private float maxTurnDelay = 1.5f;
     [SerializeField] private float postRetreatDelay = 0.4f;
-    [SerializeField] private float attackDuration = 1.5f;
-    // All enemies registered under this manager
-    private List<EnemyBrain> _all = new List<EnemyBrain>();
 
-    // Subset available to attack (excludes guards and unavailable enemies)
+    private List<EnemyBrain> _all = new List<EnemyBrain>();
     private List<EnemyBrain> _available = new List<EnemyBrain>();
 
-    private void Start()
-    {
-        // Start is intentionally empty.
-        // InitialiseWithEnemies is called by SpawnManager after enemies are spawned.
-    }
+    private void Start() { } // intentionally empty
 
-    /// <summary>
-    /// Called by SpawnManager once all enemies for this wave are instantiated.
-    /// Replaces the old GetComponentsInChildren approach.
-    /// </summary>
-    public void InitialiseWithEnemies(System.Collections.Generic.List<EnemyBrain> enemies, UnityEngine.Transform player)
+    // ── Public API ────────────────────────────────────────────────────────────
+
+    /// <summary>Called by SpawnManager once all enemies are instantiated.</summary>
+    public void InitialiseWithEnemies(List<EnemyBrain> enemies, Transform player)
     {
         _all.Clear();
         _all.AddRange(enemies);
+
+        foreach (EnemyBrain b in _all)
+            b.EnemyManager = this;
 
         AssignGuards();
         StartCoroutine(AI_Loop(null));
     }
 
-    // ── Guard assignment ──────────────────────────────────────────────────────
+    /// <summary>
+    /// Returns true if any alive melee enemy is currently guarding the given ranged brain.
+    /// Called by ranged states via EnemyBrain.HasGuardAssigned().
+    /// </summary>
+    public bool HasGuardFor(EnemyBrain ranged)
+    {
+        foreach (EnemyBrain b in _all)
+            if (b.isActiveAndEnabled && b.Phase == EnemyPhase.Guarding && b.guardTarget == ranged)
+                return true;
+        return false;
+    }
 
     /// <summary>
-    /// For each ranged enemy, find the nearest idle melee enemy and assign
-    /// it as a guard. Guards are removed from the attack pool.
+    /// Called when an enemy dies. Cleans up guard assignments and releases
+    /// any melee guard whose ranged charge just died.
     /// </summary>
+    public void OnEnemyDied(EnemyBrain dead)
+    {
+        _all.Remove(dead);
+
+        if (dead.enemyType == EnemyType.Ranged)
+        {
+            foreach (EnemyBrain b in _all)
+            {
+                if (b.Phase == EnemyPhase.Guarding && b.guardTarget == dead)
+                {
+                    b.guardTarget = null;
+                    b.ChangeState(new MeleeIdleState(b));
+                }
+            }
+        }
+    }
+
+    // ── Guard assignment ──────────────────────────────────────────────────────
+
     private void AssignGuards()
     {
         foreach (EnemyBrain ranged in _all)
@@ -52,23 +83,22 @@ public class EnemyManager : MonoBehaviour
             if (ranged.enemyType != EnemyType.Ranged) continue;
 
             EnemyBrain closestMelee = null;
-            float      closestDist  = float.MaxValue;
+            float closestDist = float.MaxValue;
 
             foreach (EnemyBrain melee in _all)
             {
                 if (melee.enemyType != EnemyType.Melee) continue;
-                if (melee.IsGuarding()) continue;
+                if (melee.Phase == EnemyPhase.Guarding) continue;
 
                 float d = Vector3.Distance(melee.transform.position, ranged.transform.position);
-                if (d < closestDist)
-                {
-                    closestDist  = d;
-                    closestMelee = melee;
-                }
+                if (d < closestDist) { closestDist = d; closestMelee = melee; }
             }
 
             if (closestMelee != null)
-                closestMelee.AssignGuard(ranged);
+            {
+                closestMelee.guardTarget = ranged;
+                closestMelee.ChangeState(new GuardState(closestMelee));
+            }
         }
     }
 
@@ -76,35 +106,54 @@ public class EnemyManager : MonoBehaviour
 
     private IEnumerator AI_Loop(EnemyBrain lastAttacker)
     {
-        if (AliveCount() == 0)
-            yield break;
+        if (AliveCount() == 0) yield break;
 
         yield return new WaitForSeconds(Random.Range(minTurnDelay, maxTurnDelay));
 
-        // Pick attacker, preferring someone other than the last one
         EnemyBrain attacker = PickAttacker(exclude: lastAttacker)
                            ?? PickAttacker(exclude: null);
 
+        // Bug fix 4 — no free attacker means all remaining melee are guards.
+        // Release them so the fight doesn't softlock.
         if (attacker == null)
+        {
+            if (AliveCount() > 0) ReleaseAllGuards();
             yield break;
+        }
 
-        // Wait until the chosen enemy is actually ready to move
+        // Bug fix 2 — escape the wait if the chosen enemy dies before its turn.
         yield return new WaitUntil(() =>
-            !attacker.IsRetreating() &&
-            !attacker.IsStunned()    &&
-            !attacker.IsGuarding());
+            !attacker.isActiveAndEnabled ||
+            (attacker.Phase != EnemyPhase.Retreating &&
+             attacker.Phase != EnemyPhase.Stunned &&
+             attacker.Phase != EnemyPhase.Guarding));
 
-        attacker.BeginAttackApproach();
+        if (!attacker.isActiveAndEnabled)
+        {
+            if (AliveCount() > 0) StartCoroutine(AI_Loop(null));
+            yield break;
+        }
 
-        // OPTION B — fixed timeout. Replace with Option A once attack animations are ready.
-        yield return new WaitForSeconds(attackDuration);
+        attacker.ChangeState(new MeleeEngageState(attacker));
 
-        // OPTION A — attack component drives retreat. Uncomment when ready:
-        // yield return new WaitUntil(() => !attacker.IsEngaging());
-        // (also remove the attackDuration field and WaitForSeconds above)
+        // Wait for MeleeEngageState to resolve (punch complete → transitions
+        // itself to MeleeIdleState, so Phase leaves Engaging).
+        yield return new WaitUntil(() =>
+            !attacker.isActiveAndEnabled ||
+            attacker.Phase != EnemyPhase.Engaging);
 
+        // Bug fix 1 — skip retreat if attacker died during engage.
+        if (!attacker.isActiveAndEnabled)
+        {
+            if (AliveCount() > 0) StartCoroutine(AI_Loop(null));
+            yield break;
+        }
 
-        attacker.BeginRetreat();
+        // Bug fix 3 — only retreat if still in Engaging phase.
+        // If the enemy already self-transitioned (player fled, AbandonMultiplier),
+        // it is already in Idle — no need to push it into Retreat.
+        if (attacker.Phase == EnemyPhase.Engaging)
+            attacker.ChangeState(new MeleeRetreatState(attacker));
 
         yield return new WaitForSeconds(postRetreatDelay);
 
@@ -114,28 +163,22 @@ public class EnemyManager : MonoBehaviour
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Pick a random available melee attacker, optionally excluding one.
-    /// Guards and ranged enemies are never picked here.
-    /// </summary>
     private EnemyBrain PickAttacker(EnemyBrain exclude)
     {
         _available.Clear();
 
         foreach (EnemyBrain b in _all)
         {
-            if (!b.isActiveAndEnabled)         continue; // dead
-            if (b.enemyType == EnemyType.Ranged) continue; // ranged manage themselves
-            if (b.IsGuarding())                continue; // guards don't leave position
-            if (b == exclude)                  continue;
-
+            if (!b.isActiveAndEnabled) continue;
+            if (b.enemyType == EnemyType.Ranged) continue;
+            if (b.Phase == EnemyPhase.Guarding) continue;
+            if (b == exclude) continue;
             _available.Add(b);
         }
 
-        if (_available.Count == 0)
-            return null;
-
-        return _available[Random.Range(0, _available.Count)];
+        return _available.Count == 0
+            ? null
+            : _available[Random.Range(0, _available.Count)];
     }
 
     private int AliveCount()
@@ -147,24 +190,20 @@ public class EnemyManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by EnemyBrain (or an attack component) when an enemy dies,
-    /// so its guard assignment can be cleaned up and a new guard found if needed.
+    /// Releases all guarding enemies back to idle and restarts the loop.
+    /// Called when PickAttacker returns null but enemies are still alive (bug fix 4).
     /// </summary>
-    public void OnEnemyDied(EnemyBrain dead)
+    private void ReleaseAllGuards()
     {
-        _all.Remove(dead);
-
-        // If a ranged enemy died, release its guard back into the attack pool
-        if (dead.enemyType == EnemyType.Ranged)
+        foreach (EnemyBrain b in _all)
         {
-            foreach (EnemyBrain b in _all)
-            {
-                if (b.IsGuarding() && b.guardTarget == dead)
-                {
-                    b.guardTarget = null;
-                    b.ChangeState(new MeleeIdleState(b));
-                }
-            }
+            if (!b.isActiveAndEnabled) continue;
+            if (b.Phase != EnemyPhase.Guarding) continue;
+            b.guardTarget = null;
+            b.ChangeState(new MeleeIdleState(b));
         }
+
+        if (AliveCount() > 0)
+            StartCoroutine(AI_Loop(null));
     }
 }

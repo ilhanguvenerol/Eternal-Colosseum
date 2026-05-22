@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8753988751009377612}
   - component: {fileID: 6899743761787408523}
   - component: {fileID: 8682179205695893969}
+  - component: {fileID: -2061003733514058338}
   m_Layer: 0
   m_Name: MeleePrefabTest
   m_TagString: Untagged
@@ -46,7 +47,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1859766477297938151}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 2675634661614555112, guid: e3bba71128477e740bbf2215de338565, type: 3}
 --- !u!23 &1303020732046952178
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -177,8 +178,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1859766477297938151}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: e3bba71128477e740bbf2215de338565, type: 3}
+  m_Controller: {fileID: 9100000, guid: a1a7e00b8d3b5f542b498ae4f4ed8df6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -214,7 +215,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &8682179205695893969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,3 +241,16 @@ MonoBehaviour:
   guardOffset: 2.62
   currentStateName: 
   guardTarget: {fileID: 0}
+  EnemyManager: {fileID: 0}
+--- !u!114 &-2061003733514058338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859766477297938151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b46da4418fa1b4eacbaf769f74592b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
