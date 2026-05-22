@@ -68,6 +68,8 @@ public class EnemyBrain : MonoBehaviour
 
     private EnemyState _currentState;
     private bool _initialised;
+    [Header("Combat")]
+    [SerializeField] private float attackDamage = 10f;
 
     // ── Unity ─────────────────────────────────────────────────────────────────
 
@@ -76,6 +78,11 @@ public class EnemyBrain : MonoBehaviour
         Agent = GetComponent<NavMeshAgent>();
         EnemyAnimator = GetComponent<EnemyAnimator>();
         Agent.updateRotation = false;
+
+        if (EnemyAnimator != null)
+        {
+            EnemyAnimator.OnAttackHitFrame += DealDamageToPlayer;
+        }
     }
 
     private void Update()
@@ -161,6 +168,19 @@ public class EnemyBrain : MonoBehaviour
         _initialised = false; // stop state updates immediately
         StopMoving();
         EnemyAnimator?.PlayDeath();
+    }
+
+    private void DealDamageToPlayer()
+    {
+        if (!_initialised || Player == null) return;
+
+        PlayerHealth playerHealth = Player.GetComponent<PlayerHealth>();
+
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(attackDamage);
+            Debug.Log($"[Enemy] Player hit for {attackDamage} damage.");
+        }
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
