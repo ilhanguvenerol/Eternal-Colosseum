@@ -162,6 +162,18 @@ public class EnemyBrain : MonoBehaviour
         ChangeState(new StunnedState(this, resumeState));
     }
 
+
+    public void OnParried()
+    {
+        Debug.Log("[Enemy] Attack parried!");
+
+        EnemyState resumeState = enemyType == EnemyType.Melee
+            ? (EnemyState)new MeleeIdleState(this)
+            : (EnemyState)new RangedEngageState(this);
+
+        ChangeState(new StunnedState(this, resumeState));
+    }
+
     /// <summary>Called by the damage/combat component when this enemy dies.</summary>
     public void OnDeath()
     {
@@ -173,6 +185,14 @@ public class EnemyBrain : MonoBehaviour
     private void DealDamageToPlayer()
     {
         if (!_initialised || Player == null) return;
+
+        PlayerCombatState playerCombat = Player.GetComponent<PlayerCombatState>();
+
+        if (playerCombat != null && playerCombat.IsParrying)
+        {
+            OnParried();
+            return;
+        }
 
         PlayerHealth playerHealth = Player.GetComponent<PlayerHealth>();
 
