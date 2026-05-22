@@ -14,6 +14,15 @@ public class PlayerCombatState : MonoBehaviour
     private PlayerInputActions _input;
     private SpellData _equippedSpell;
 
+    // ── Parry State ───────────────────────────────────────────────────────────
+    private bool _isParrying;
+
+    /// <summary>
+    /// True while the player is inside the active parry window.
+    /// Enemy attacks check this before dealing damage.
+    /// </summary>
+    public bool IsParrying => _isParrying;
+
     private void Awake()
     {
         _input = new PlayerInputActions();
@@ -50,47 +59,62 @@ public class PlayerCombatState : MonoBehaviour
     // ── Combat Actions ────────────────────────────────────────────────────────
 
     private void TrySwordAttack()
-{
-    if (_player.Animator.IsCombatLocked) return;
-
-    _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
-
-    if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
     {
-        float totalDamage = Inventory.Instance.equippedWeapon.baseDamage + Inventory.Instance.GetTotalBonusDamage();
+        if (_player.Animator.IsCombatLocked) return;
 
-        Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
-        Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
+        _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
 
-        PlayerMana playerMana = _player.GetComponent<PlayerMana>();
-
-        Collider[] hits = Physics.OverlapSphere(_player.transform.position, 2f);
-
-        foreach (Collider hit in hits)
+        if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
         {
-           EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+            float totalDamage =
+                Inventory.Instance.equippedWeapon.baseDamage +
+                Inventory.Instance.GetTotalBonusDamage();
 
-            if (enemy != null)
+            Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
+            Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
+
+            PlayerMana playerMana = _player.GetComponent<PlayerMana>();
+
+            // Detect nearby enemies
+            Collider[] hits = Physics.OverlapSphere(_player.transform.position, 2f);
+
+            foreach (Collider hit in hits)
             {
-                enemy.TakeDamage(totalDamage, playerMana);
+                EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(totalDamage, playerMana);
+                }
             }
         }
+        else
+        {
+            Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
+        }
     }
-    else
-    {
-        Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
-    }
-}
 
+    /// <summary>
+    /// Starts a short parry window.
+    /// Enemy attacks during this time will stun the attacker instead of
+    /// damaging the player.
+    /// </summary>
     private void TryParry()
     {
         if (_player.Animator.IsCombatLocked) return;
+
+        _isParrying = true;
+
         _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_PARRY);
+
+        // Close the parry window after a short duration
+        Invoke(nameof(EndParry), 0.5f);
     }
 
     private void TryCastSpell()
     {
         if (_player.Animator.IsCombatLocked) return;
+
         if (_equippedSpell == null)
         {
             Debug.Log("[PlayerCombatState] No spell equipped.");
@@ -103,5 +127,15 @@ public class PlayerCombatState : MonoBehaviour
     private void TryExitSpell()
     {
         _player.Animator.ExitCombat();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Ends the active parry window.
+    /// </summary>
+    private void EndParry()
+    {
+        _isParrying = false;
     }
 }
