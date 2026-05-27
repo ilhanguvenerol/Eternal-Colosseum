@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83c74693048884c44808369189688901, type: 3}
+  m_Name: PyreWraith
+  m_EditorClassIdentifier: Assembly-CSharp::PyreWraithItem
+  itemName: Pyrewraith
+  price: 649
+  itemIcon: {fileID: 21300000, guid: f11fc59a4e2e3644d9abb45ac7ded2f2, type: 3}
+  rarity: 2
+  bonusHealth: 0
+  bonusDamage: 0
+  bonusSpeed: 0
+  bonusArmor: 0
+  explosionRadius: 3
+  damageMultiplier: 0.3
+  wrathEffectPrefab: {fileID: 0}

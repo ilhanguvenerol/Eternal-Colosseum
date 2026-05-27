@@ -219,6 +219,7 @@ public class EnemyBrain : MonoBehaviour
 
     private void FeedAnimator()
     {
+
         if (EnemyAnimator == null) return;
         Vector3 localVel = transform.InverseTransformDirection(Agent.velocity);
         EnemyAnimator.UpdateMovement(localVel.x, localVel.z);

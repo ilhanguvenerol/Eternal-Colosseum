@@ -1,29 +1,34 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Item")]
-public class ItemData : ScriptableObject
+
+
+
+// Marked abstract and removed the CreateAssetMenu attribute
+public abstract class ItemData : ScriptableObject
 {
-
-    [Header("Basic Info")]
+    [Header("Shop & UI Data")]
     public string itemName;
-    public string description;
-    public Sprite icon;
+    public int price;
+    public Sprite itemIcon;
     public ItemRarity rarity;
 
-    [Header("Stats")]
+    [Header("Passive Stat Bonuses")]
     public float bonusHealth;
-    public float bonusSpeed;
     public float bonusDamage;
+    public float bonusSpeed;
     public float bonusArmor;
 
-    [Header("Economy")]
-    public int price;
-}
+    // ── Polymorphic Triggers (Virtual so children only override what they need) ──
 
+    public virtual void OnEquipEffect(GameObject player) { }
 
-public enum ItemRarity
-{
-    Common,
-    Rare,
-    Epic
+    public virtual void OnHitEffect(GameObject player, GameObject targetEnemy, float damageDealt) { }
+
+    public virtual void OnKillEffect(GameObject player, GameObject killedEnemy) { }
+
+    public virtual float OnTakeDamageEffect(GameObject player, float damageTaken)
+    {
+        return damageTaken; // Safely returns unmodified damage by default
+    }
 }

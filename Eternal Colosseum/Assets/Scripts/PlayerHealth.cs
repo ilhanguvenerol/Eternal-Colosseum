@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,17 +11,17 @@ public class PlayerHealth : MonoBehaviour
     [Header("Health Settings")]
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private bool canRegenerate = false;
-    [SerializeField] private float regenRate = 5f;        // saniyede kaç HP
-    [SerializeField] private float regenDelay = 3f;       // hasar sonrası bekleme
+    [SerializeField] private float regenRate = 5f;
+    [SerializeField] private float regenDelay = 3f;
 
     [Header("Invincibility")]
-    [SerializeField] private float invincibilityDuration = 0.5f; // hasar sonrası kısa dokunulmazlık
+    [SerializeField] private float invincibilityDuration = 0.5f;
 
     // ─────────────────────────────────────────
-    //  Events  (Inspector'dan UI / efekt bağlanabilir)
+    //  Events
     // ─────────────────────────────────────────
     [Header("Events")]
-    public UnityEvent<float> onHealthChanged;   // yeni HP değeri gönderir
+    public UnityEvent<float> onHealthChanged;
     public UnityEvent onDeath;
 
     // ─────────────────────────────────────────
@@ -35,8 +36,12 @@ public class PlayerHealth : MonoBehaviour
     //  Properties
     // ─────────────────────────────────────────
     public float CurrentHealth => currentHealth;
-    public float MaxHealth     => maxHealth;
-    public bool  IsDead        => isDead;
+    public float MaxHealth
+    {
+        get => maxHealth;
+        set => maxHealth = value;
+    }
+    public bool IsDead => isDead;
 
     // ─────────────────────────────────────────
     //  Unity Lifecycle
@@ -48,13 +53,11 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
-        // Grant bonus health from inventory items/charms/skills
         if (Inventory.Instance != null)
         {
             float bonusHealth = Inventory.Instance.GetTotalBonusHealth();
             maxHealth += bonusHealth;
-            currentHealth = maxHealth; // Bonus is applied at start, so we can set current to max directly
-
+            currentHealth = maxHealth;
             Debug.Log($"[STATS] Total Max Health initialized to: {maxHealth}");
         }
     }
@@ -68,32 +71,83 @@ public class PlayerHealth : MonoBehaviour
     //  Public API
     // ─────────────────────────────────────────
 
-    /// <summary>Düşman scriptlerinden çağrılır.</summary>
     public void TakeDamage(float amount)
     {
         if (isDead || isInvincible) return;
 
-        currentHealth = Mathf.Clamp(currentHealth - amount, 0f, maxHealth);
+        float finalDamage = amount;
+        if (Inventory.Instance != null)
+        {
+            foreach (ItemData item in Inventory.Instance.ownedItems)
+                finalDamage = item.OnTakeDamageEffect(this.gameObject, finalDamage);
+        }
+
+        if (finalDamage <= 0f) return;
+
+        currentHealth = Mathf.Clamp(currentHealth - finalDamage, 0f, maxHealth);
         lastDamageTime = Time.time;
 
-        Debug.Log($"[Health] Hasar alındı: {amount}  |  Kalan HP: {currentHealth}");
+        Debug.Log($"[Health] Hasar alındı: {finalDamage}  |  Kalan HP: {currentHealth}");
 
         onHealthChanged?.Invoke(currentHealth);
-
         StartCoroutine(InvincibilityRoutine());
 
         if (currentHealth <= 0f)
             Die();
     }
 
-    /// <summary>İyileştirme potionları için.</summary>
     public void Heal(float amount)
     {
         if (isDead) return;
-
         currentHealth = Mathf.Clamp(currentHealth + amount, 0f, maxHealth);
         Debug.Log($"[Health] İyileştirildi: {amount}  |  HP: {currentHealth}");
         onHealthChanged?.Invoke(currentHealth);
+    }
+
+    public void RefreshBonusHealth()
+    {
+        if (Inventory.Instance == null) return;
+        float newMax = 100f + Inventory.Instance.GetTotalBonusHealth();
+        float diff = newMax - maxHealth;
+        maxHealth = newMax;
+        currentHealth = Mathf.Clamp(currentHealth + diff, 0f, maxHealth);
+        onHealthChanged?.Invoke(currentHealth);
+    }
+
+    // ── NEW: Required by SurgeonsVialItem ────────────────────────────────────
+    /// <summary>
+    /// Heals the player after a delay. Called by SurgeonsVialItem since
+    /// ScriptableObjects cannot run Coroutines themselves.
+    /// </summary>
+    public void HealAfterDelay(float amount, float delay)
+    {
+        StartCoroutine(DelayedHeal(amount, delay));
+    }
+
+    private IEnumerator DelayedHeal(float amount, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Heal(amount);
+    }
+
+    // ── NEW: Required by PhantomWrapItem ─────────────────────────────────────
+    /// <summary>
+    /// Activates the Phantom Wrap stealth veil for a duration.
+    /// Called by PhantomWrapItem since ScriptableObjects cannot run Coroutines.
+    /// EnemyBrain should check PhantomWrapItem.IsVeilActive before attacking.
+    /// </summary>
+    public void StartPhantomVeil(float duration)
+    {
+        StartCoroutine(PhantomVeilRoutine(duration));
+    }
+
+    private IEnumerator PhantomVeilRoutine(float duration)
+    {
+        PhantomWrapItem.IsVeilActive = true;
+        Debug.Log("[Health] Phantom Wrap veil active.");
+        yield return new WaitForSeconds(duration);
+        PhantomWrapItem.IsVeilActive = false;
+        Debug.Log("[Health] Phantom Wrap veil faded.");
     }
 
     // ─────────────────────────────────────────
@@ -104,7 +158,6 @@ public class PlayerHealth : MonoBehaviour
         isDead = true;
         Debug.Log("[Health] Oyuncu öldü!");
         onDeath?.Invoke();
-        // TODO: ölüm animasyonu, respawn, game over ekranı buraya
     }
 
     private void HandleRegen()
@@ -117,7 +170,7 @@ public class PlayerHealth : MonoBehaviour
         onHealthChanged?.Invoke(currentHealth);
     }
 
-    private System.Collections.IEnumerator InvincibilityRoutine()
+    private IEnumerator InvincibilityRoutine()
     {
         isInvincible = true;
         yield return new WaitForSeconds(invincibilityDuration);
