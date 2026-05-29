@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 130b975f10bc34042997a5d32f765fe1, type: 3}
+  m_Name: LastRiteMedallion
+  m_EditorClassIdentifier: Assembly-CSharp::LastRiteMedallionItem
+  itemName: Lastrite medallion
+  price: 700
+  itemIcon: {fileID: 21300000, guid: 76f986175a80d2a4cab523dacb078ece, type: 3}
+  rarity: 3
+  bonusHealth: 0
+  bonusDamage: 0
+  bonusSpeed: 0
+  bonusArmor: 0
+  reviveHealthPercent: 0.5

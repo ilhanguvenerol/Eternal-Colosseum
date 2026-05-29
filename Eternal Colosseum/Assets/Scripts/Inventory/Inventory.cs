@@ -20,34 +20,51 @@ public class Inventory : MonoBehaviour
     public int maxCharmSlots = 3;
 
     [Header("Currency")]
-    public int currentGold; // The player's current gold amount, can be modified by shops, rewards, etc.
+    public int currentGold;
 
     [Header("References")]
     public Transform weaponSlot;
 
     private void Awake()
     {
-        // Assign instance immediately so other scripts' Start() can find it
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
+            if (this.ownedItems.Count > 0)
+                Instance.ownedItems.AddRange(this.ownedItems);
+
             Destroy(gameObject);
         }
     }
 
-    private void Start()
+
+    //  NEW: BloodmossWrapItem passive heal tick 
+    private void Update()
     {
-        ClearInventory();
-        currentGold = 100;
+        PlayerHealth ph = GetComponent<PlayerHealth>();
+        if (ph == null) return;
+
+        foreach (var item in ownedItems)
+        {
+            if (item is BloodmossWrapItem wrap)
+                ph.Heal(wrap.healPerSecond * Time.deltaTime);
+        }
     }
+
+    // ─────────────────────────────────────────
+    //  Item Management
+    // ─────────────────────────────────────────
+
 
     public void AddItem(ItemData item)
     {
+        if (item == null) return;
         ownedItems.Add(item);
+        item.OnEquipEffect(gameObject); // Fire equip effects (FervorDraught, EchoSigil, ObsidianMask etc.)
     }
 
     public void AddCharm(CharmData charm)
@@ -65,33 +82,26 @@ public class Inventory : MonoBehaviour
         ownedWeapons.Add(weapon);
     }
 
+    // ─────────────────────────────────────────
+    //  Equip / Unequip
+    // ─────────────────────────────────────────
+
     public bool EquipWeapon(WeaponData weapon)
     {
-        // 1. Validation check
         if (weapon == null || !ownedWeapons.Contains(weapon)) return false;
 
-        // 2. Clear the hand if something is already there
         if (weaponSlot != null && weaponSlot.childCount > 0)
         {
             foreach (Transform child in weaponSlot)
-            {
                 Destroy(child.gameObject);
-            }
         }
 
-        // 3. Update the data
         equippedWeapon = weapon;
 
-        // 4. Physical Spawning
         if (weaponSlot != null && weapon.weaponPrefab != null)
         {
-            // Instantiate the prefab
             GameObject newWeapon = Instantiate(weapon.weaponPrefab);
-
-            // Parent it to the hand slot
             newWeapon.transform.SetParent(weaponSlot);
-
-            // Reset position and rotation so it snaps to the hand
             newWeapon.transform.localPosition = Vector3.zero;
             newWeapon.transform.localRotation = Quaternion.identity;
         }
@@ -115,20 +125,15 @@ public class Inventory : MonoBehaviour
         return true;
     }
 
-    public bool UnequipCharm(CharmData charm)
-    {
-        return equippedCharms.Remove(charm);
-    }
+    public bool UnequipCharm(CharmData charm) => equippedCharms.Remove(charm);
 
-    public void UnequipWeapon()
-    {
-        equippedWeapon = null;
-    }
+    public void UnequipWeapon() => equippedWeapon = null;
 
-    public void UnequipSkill()
-    {
-        equippedSkill = null;
-    }
+    public void UnequipSkill() => equippedSkill = null;
+
+    // ─────────────────────────────────────────
+    //  Stat Aggregation
+    // ─────────────────────────────────────────
 
     public float GetTotalBonusHealth()
     {
@@ -162,6 +167,10 @@ public class Inventory : MonoBehaviour
         return total;
     }
 
+    // ─────────────────────────────────────────
+    //  Utility
+    // ─────────────────────────────────────────
+
     public void ClearInventory()
     {
         ownedItems.Clear();
@@ -175,17 +184,17 @@ public class Inventory : MonoBehaviour
 
     public bool BuyItem(ItemData itemToBuy)
     {
-
         if (currentGold < itemToBuy.price)
         {
-            Debug.LogWarning($"[Shop] Not enough gold for {itemToBuy.itemName})! Need {itemToBuy.price - currentGold} more.");
+            Debug.LogWarning($"[Shop] Not enough gold for {itemToBuy.itemName}! Need {itemToBuy.price - currentGold} more.");
             return false;
         }
 
         currentGold -= itemToBuy.price;
         ownedItems.Add(itemToBuy);
+        itemToBuy.OnEquipEffect(gameObject); // Fire equip effect on purchase too
 
-        Debug.Log($"[Shop] Bought {itemToBuy.itemName} for {itemToBuy.price} gold. Remaining gold: {currentGold}");
+        Debug.Log($"[Shop] Bought {itemToBuy.itemName} for {itemToBuy.price} gold. Remaining: {currentGold}");
         return true;
     }
 }

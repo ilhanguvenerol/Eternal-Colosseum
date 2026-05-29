@@ -13,6 +13,7 @@ public class PlayerCombatState : MonoBehaviour
 
     private PlayerInputActions _input;
     private SpellData _equippedSpell;
+    private GameObject _playerObj;
 
     // ── Parry State ───────────────────────────────────────────────────────────
     private bool _isParrying;
@@ -26,11 +27,16 @@ public class PlayerCombatState : MonoBehaviour
     private void Awake()
     {
         _input = new PlayerInputActions();
-
         _input.Combat.SwordAttack.performed += _ => TrySwordAttack();
         _input.Combat.Parry.performed += _ => TryParry();
-        _input.Combat.Spell.performed += _ => TryCastSpell();    // single Spell action now
+        _input.Combat.Spell.performed += _ => TryCastSpell();
         _input.Combat.Spell.canceled += _ => TryExitSpell();
+
+        // Cache in Awake so it's ready before any Start() runs
+        _playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (_playerObj == null)
+            Debug.LogError("[PlayerCombatState] No GameObject tagged 'Player' found! " +
+                           "Select your Player in the Hierarchy and set its Tag to 'Player'.");
     }
 
     private void Start()
@@ -42,16 +48,12 @@ public class PlayerCombatState : MonoBehaviour
     private void OnEnable() => _input.Enable();
     private void OnDisable() => _input.Disable();
 
-    // ── Public API (call from inventory system later) ─────────────────────────
+    // ── Public API ────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Equip a new spell. Safe to call anytime outside of combat.
-    /// The inventory system will call this when the player swaps spells.
-    /// </summary>
     public void EquipSpell(SpellData spell)
     {
         _equippedSpell = spell;
-        _player.Animator.EquipSpell(spell);   // swaps the animation clip
+        _player.Animator.EquipSpell(spell);
     }
 
     public SpellData EquippedSpell => _equippedSpell;
@@ -62,35 +64,48 @@ public class PlayerCombatState : MonoBehaviour
     {
         if (_player.Animator.IsCombatLocked) return;
 
+        // ── SAFETY CHECK ─────────────────────────────────────────────────────
+        // If the Inventory system isn't ready, or no weapon is equipped, 
+        // just exit the method silently instead of warning the console.
+        if (Inventory.Instance == null || Inventory.Instance.equippedWeapon == null)
+        {
+            return;
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
 
-        if (Inventory.Instance != null && Inventory.Instance.equippedWeapon != null)
+        float totalDamage = Inventory.Instance.equippedWeapon.baseDamage
+                          + Inventory.Instance.GetTotalBonusDamage();
+
+        PlayerMana playerMana = _player.GetComponent<PlayerMana>();
+
+        Collider[] hits = Physics.OverlapSphere(_player.transform.position, 4f);
+
+        System.Collections.Generic.HashSet<EnemyHealth> damagedEnemies =
+            new System.Collections.Generic.HashSet<EnemyHealth>();
+
+        foreach (Collider hit in hits)
         {
-            float totalDamage =
-                Inventory.Instance.equippedWeapon.baseDamage +
-                Inventory.Instance.GetTotalBonusDamage();
+            EnemyHealth enemy = null;
 
-            Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
-            Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
+            if (hit.transform.parent != null)
+                enemy = hit.transform.parent.GetComponentInParent<EnemyHealth>();
 
-            PlayerMana playerMana = _player.GetComponent<PlayerMana>();
+            if (enemy == null && hit.transform.root != null)
+                enemy = hit.transform.root.GetComponentInChildren<EnemyHealth>();
 
-            // Detect nearby enemies
-            Collider[] hits = Physics.OverlapSphere(_player.transform.position, 2f);
-
-            foreach (Collider hit in hits)
+            if (enemy != null && !enemy.IsDead && !damagedEnemies.Contains(enemy))
             {
-                EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
+                damagedEnemies.Add(enemy);
+                enemy.TakeDamage(totalDamage, playerMana);
 
-                if (enemy != null)
+                if (_playerObj != null)
                 {
-                    enemy.TakeDamage(totalDamage, playerMana);
+                    foreach (ItemData item in Inventory.Instance.ownedItems)
+                        item.OnHitEffect(_playerObj, enemy.gameObject, totalDamage);
                 }
             }
-        }
-        else
-        {
-            Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
         }
     }
 
@@ -120,7 +135,6 @@ public class PlayerCombatState : MonoBehaviour
             Debug.Log("[PlayerCombatState] No spell equipped.");
             return;
         }
-
         _player.Animator.PlaySpell();
     }
 

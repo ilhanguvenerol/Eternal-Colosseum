@@ -73,9 +73,14 @@ public class ShopManager : MonoBehaviour
     }
 
     // Rolls a rarity based on the configured shop chances
+    // Rolls a rarity based on the configured shop chances
     private ItemRarity RollRarity()
     {
-        float roll = Random.Range(0f, 100f);
+        // By adding epicChance here, we remove the warning AND make your code safer.
+        // Now, if someone accidentally sets the chances to 50, 50, 50 in the Inspector, 
+        // the math will still work perfectly instead of breaking.
+        float totalChance = commonChance + rareChance + epicChance;
+        float roll = Random.Range(0f, totalChance);
 
         if (roll <= commonChance)
         {

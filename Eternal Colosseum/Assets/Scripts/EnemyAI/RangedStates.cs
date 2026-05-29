@@ -31,7 +31,6 @@ public class RangedEngageState : EnemyState
     }
 }
 
-
 // ─────────────────────────────────────────────────────────────────────────────
 // LOOSE
 // Stands ground and fires. Attack logic lives outside this file.
@@ -70,7 +69,6 @@ public class LooseState : EnemyState
 
     private bool HasGuard() => brain.HasGuardAssigned();
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DISENGAGE
@@ -122,4 +120,3 @@ public class DisengageState : EnemyState
 
     private bool HasGuard() => brain.HasGuardAssigned();
 }
-
