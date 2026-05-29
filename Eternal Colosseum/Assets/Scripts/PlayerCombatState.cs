@@ -64,27 +64,23 @@ public class PlayerCombatState : MonoBehaviour
     {
         if (_player.Animator.IsCombatLocked) return;
 
-        // İlhan's animation call
-        _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
-
+        // ── SAFETY CHECK ─────────────────────────────────────────────────────
+        // If the Inventory system isn't ready, or no weapon is equipped, 
+        // just exit the method silently instead of warning the console.
         if (Inventory.Instance == null || Inventory.Instance.equippedWeapon == null)
         {
-            Debug.LogWarning("[COMBAT] Attack triggered but no weapon is equipped!");
             return;
         }
+        // ─────────────────────────────────────────────────────────────────────
 
-        // İlhan's damage calculation
+        _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
+
         float totalDamage = Inventory.Instance.equippedWeapon.baseDamage
                           + Inventory.Instance.GetTotalBonusDamage();
 
-        Debug.Log($"[COMBAT] Attacking with: {Inventory.Instance.equippedWeapon.weaponName}");
-        Debug.Log($"[STATS] Total Calculated Damage: {totalDamage}");
-
         PlayerMana playerMana = _player.GetComponent<PlayerMana>();
 
-        // Your optimized physics loop
         Collider[] hits = Physics.OverlapSphere(_player.transform.position, 4f);
-        Debug.Log($"[PHYSICS] OverlapSphere caught {hits.Length} colliders in range.");
 
         System.Collections.Generic.HashSet<EnemyHealth> damagedEnemies =
             new System.Collections.Generic.HashSet<EnemyHealth>();

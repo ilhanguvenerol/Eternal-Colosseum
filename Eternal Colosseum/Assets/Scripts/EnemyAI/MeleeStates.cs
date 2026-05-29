@@ -73,7 +73,6 @@ public class MeleeIdleState : EnemyState
 public class MeleeEngageState : EnemyState
 {
     private const float AbandonMultiplier = 4f;
-
     private bool _attackStarted;
 
     public MeleeEngageState(EnemyBrain brain) : base(brain) { }
@@ -83,18 +82,19 @@ public class MeleeEngageState : EnemyState
         brain.Phase = EnemyPhase.Engaging;
         _attackStarted = false;
 
-        brain.EnemyAnimator.OnPunchComplete += OnPunchFinished;
+        // Safe check: Only subscribe if the animator exists
+        if (brain.EnemyAnimator != null)
+            brain.EnemyAnimator.OnPunchComplete += OnPunchFinished;
+
         brain.MoveTo(player.position, brain.engageSpeed);
     }
 
     public override void Update()
     {
-        // Already swinging — wait for the animation event.
         if (_attackStarted) return;
 
         float dist = brain.DistanceToPlayer();
 
-        // Player ran far away — abandon approach and return to orbit.
         if (dist > brain.engageStopDistance * AbandonMultiplier)
         {
             brain.ChangeState(new MeleeIdleState(brain));
@@ -107,24 +107,26 @@ public class MeleeEngageState : EnemyState
         }
         else
         {
-            // In range — stop and swing.
             brain.StopMoving();
             _attackStarted = true;
-            brain.EnemyAnimator.PlayPunch();
+
+            // Safe check: Play punch, or instantly finish if no animator
+            if (brain.EnemyAnimator != null)
+                brain.EnemyAnimator.PlayPunch();
+            else
+                OnPunchFinished();
         }
     }
 
     public override void Exit()
     {
-        // Always unsubscribe regardless of how the state exits
-        // (abandon, stun interrupt, death).
-        brain.EnemyAnimator.OnPunchComplete -= OnPunchFinished;
+        // Safe check
+        if (brain.EnemyAnimator != null)
+            brain.EnemyAnimator.OnPunchComplete -= OnPunchFinished;
     }
 
     private void OnPunchFinished()
     {
-        // Punch animation done — leave Engaging so EnemyManager
-        // sees Phase != Engaging and sends the retreat signal.
         brain.ChangeState(new MeleeIdleState(brain));
     }
 }
@@ -228,12 +230,16 @@ public class StunnedState : EnemyState
         brain.Phase = EnemyPhase.Stunned;
         brain.StopMoving();
 
-        brain.EnemyAnimator.OnHitComplete += OnHitAnimationFinished;
+        if (brain.EnemyAnimator != null)
+            brain.EnemyAnimator.OnHitComplete += OnHitAnimationFinished;
+        else
+            OnHitAnimationFinished(); // Instantly un-stun if missing component
     }
 
     public override void Exit()
     {
-        brain.EnemyAnimator.OnHitComplete -= OnHitAnimationFinished;
+        if (brain.EnemyAnimator != null)
+            brain.EnemyAnimator.OnHitComplete -= OnHitAnimationFinished;
     }
 
     private void OnHitAnimationFinished()
