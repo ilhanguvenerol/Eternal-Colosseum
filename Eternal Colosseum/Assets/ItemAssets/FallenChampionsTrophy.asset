@@ -21,4 +21,4 @@ MonoBehaviour:
   bonusSpeed: 0
   bonusArmor: 0
   healAmount: 8
-  healOrbPrefab: {fileID: 0}
+  healOrbPrefab: {fileID: 5262563739471820272, guid: bbd3b633ad303984c9bfc79c7b852f77, type: 3}
