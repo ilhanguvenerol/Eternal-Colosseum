@@ -22,7 +22,11 @@ public sealed class StarterEquipment : MonoBehaviour
         // Weapon
         if (starterSword != null)
         {
-            Inventory.Instance.AddWeapon(starterSword);
+            // Check if the inventory already has the sword before adding it
+            if (!Inventory.Instance.ownedWeapons.Contains(starterSword))
+            {
+                Inventory.Instance.AddWeapon(starterSword);
+            }
             Inventory.Instance.EquipWeapon(starterSword);
         }
 

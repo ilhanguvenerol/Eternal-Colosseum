@@ -42,16 +42,7 @@ public class Inventory : MonoBehaviour
     }
 
 
-    private void Start()
-    {
-        ClearInventory();
-        currentGold = 100;
-    }
-
-
-    // ── NEW: BloodmossWrapItem passive heal tick ──────────────────────────────
-    // BloodmossWrapItem cannot run a Coroutine (ScriptableObject),
-    // so Inventory ticks it every frame here.
+    //  NEW: BloodmossWrapItem passive heal tick 
     private void Update()
     {
         PlayerHealth ph = GetComponent<PlayerHealth>();
