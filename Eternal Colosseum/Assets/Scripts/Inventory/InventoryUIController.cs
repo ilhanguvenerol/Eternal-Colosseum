@@ -19,7 +19,7 @@ public class InventoryUIController : MonoBehaviour
     public Transform skillsContent;
     public Transform weaponsContent;
 
-    // ── Description Panel ─────────────────────────────────────────────────────
+    // ── Description Panel 
     [Header("Description Panel")]
     public Image itemIconDisplay;
     public TextMeshProUGUI itemNameText;
@@ -28,16 +28,16 @@ public class InventoryUIController : MonoBehaviour
     public Button equipButton;
     private TextMeshProUGUI _equipBtnLabel;
 
-    // ── Prefab ────────────────────────────────────────────────────────────────
+    // ── Prefab 
     [Header("Prefab")]
     public GameObject itemButtonPrefab;
 
-    // ── Runtime ───────────────────────────────────────────────────────────────
+    // ── Runtime
     private ScriptableObject _inspected; // whatever is currently selected
 
-    // ─────────────────────────────────────────────────────────────────────────
+
     //  Unity Lifecycle
-    // ─────────────────────────────────────────────────────────────────────────
+    
 
     private void Awake()
 {
@@ -52,13 +52,19 @@ public class InventoryUIController : MonoBehaviour
 
     private void OnEnable()
     {
+        StartCoroutine(RefreshUIDelayed());
+
+    }
+    private System.Collections.IEnumerator RefreshUIDelayed()
+    {
         // Auto-refresh every time the panel is opened
+        yield return null; // Small delay to ensure the panel is fully initialized
         RefreshUI();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    
     //  Public API
-    // ─────────────────────────────────────────────────────────────────────────
+   
 
     /// <summary>Call this after any inventory change to keep the UI in sync.</summary>
     public void RefreshUI()
@@ -68,14 +74,14 @@ public class InventoryUIController : MonoBehaviour
 
         if (Inventory.Instance == null) return;
 
-        // ── Items (passive, always active — no equip button shown) ────────────
+        // ── Items (passive, always active — no equip button shown) 
         foreach (ItemData item in Inventory.Instance.ownedItems)
         {
             string stats = BuildItemStats(item);
             SpawnButton(item, itemsContent, item.itemName, stats, item.itemIcon);
         }
 
-        // ── Charms (equippable, max 3) ────────────────────────────────────────
+        // ── Charms (equippable, max 3) 
         foreach (CharmData charm in Inventory.Instance.ownedCharms)
         {
             bool equipped = Inventory.Instance.equippedCharms.Contains(charm);
@@ -85,7 +91,7 @@ public class InventoryUIController : MonoBehaviour
             SpawnButton(charm, charmsContent, label, stats, null);
         }
 
-        // ── Skills (equippable, max 1) ────────────────────────────────────────
+        // ── Skills (equippable, max 1) 
         foreach (SkillData skill in Inventory.Instance.ownedSkills)
         {
             bool equipped = Inventory.Instance.equippedSkill == skill;
@@ -93,7 +99,7 @@ public class InventoryUIController : MonoBehaviour
             SpawnButton(skill, skillsContent, label, "Active Skill", null);
         }
 
-        // ── Weapons (equippable, max 1) ───────────────────────────────────────
+        // ── Weapons (equippable, max 1) 
         foreach (WeaponData weapon in Inventory.Instance.ownedWeapons)
         {
             bool equipped = Inventory.Instance.equippedWeapon == weapon;
@@ -103,9 +109,9 @@ public class InventoryUIController : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+    
     //  Private Helpers
-    // ─────────────────────────────────────────────────────────────────────────
+    
 
     private void SpawnButton(ScriptableObject data, Transform parent,
                              string label, string stats, Sprite icon)
@@ -135,7 +141,7 @@ public class InventoryUIController : MonoBehaviour
 
     private void ShowDescription(string name, Sprite icon, string stats, ScriptableObject data)
     {
-        Debug.Log($"[UI DEBUG] Clicking{name}.Is Icon Null? {icon == null}");
+        
         // Name
         itemNameText.text = name.Replace("[E] ", ""); // strip equipped marker for the title
 
