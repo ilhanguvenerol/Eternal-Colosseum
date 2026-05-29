@@ -6,14 +6,10 @@ public class PyreWraithItem : ItemData
     [Header("Wraith Settings")]
     public float explosionRadius = 7f;
     public float damageMultiplier = 2.5f; // 250% of killed enemy's max HP as AOE damage
-    public GameObject wrathEffectPrefab; // Assign a dramatic soul-burst VFX in the Inspector
 
     public override void OnKillEffect(GameObject player, GameObject killedEnemy)
     {
         Debug.Log("[ITEM] Pyre Wraith detonated — a soul unleashed!");
-
-        if (wrathEffectPrefab != null)
-            Instantiate(wrathEffectPrefab, killedEnemy.transform.position, Quaternion.identity);
 
         // Base the explosion damage on the fallen enemy's max health for natural scaling
         EnemyHealth killedHP = killedEnemy.GetComponent<EnemyHealth>();

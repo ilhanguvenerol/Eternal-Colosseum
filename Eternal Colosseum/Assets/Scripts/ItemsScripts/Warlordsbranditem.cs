@@ -6,14 +6,10 @@ public class WarlordsBrandItem : ItemData
     [Header("Shockwave Settings")]
     public float shockwaveRadius = 3f;
     public float damagePercentage = 0.6f; // 60% of original hit as AOE
-    public GameObject shockwaveEffectPrefab;
 
     public override void OnHitEffect(GameObject player, GameObject targetEnemy, float damageDealt)
     {
         Debug.Log("[ITEM] Warlord's Brand shockwave!");
-
-        if (shockwaveEffectPrefab != null)
-            Instantiate(shockwaveEffectPrefab, targetEnemy.transform.position, Quaternion.identity);
 
         float aoeDamage = damageDealt * damagePercentage;
 
