@@ -39,6 +39,7 @@ public class EnemyBrain : MonoBehaviour
     public float rangedFireDistance = 10f;
     public float disengageThreshold = 3f;
     public float guardOffset = 1.2f;
+    public float proximityAttackRange = 2.5f; // idles and guards react if player steps inside
 
     // ── Phase ─────────────────────────────────────────────────────────────────
 

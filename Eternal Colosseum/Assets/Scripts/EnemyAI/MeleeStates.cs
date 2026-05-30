@@ -12,17 +12,19 @@ public class MeleeIdleState : EnemyState
     private const float ChaseMultiplier = 3f;
     private const float AngleDriftSpeed = 0.4f;
     private const float AngleDriftInterval = 1.2f;
+    private const float ProximityAttackCooldown = 3f;
 
     private float _angle;
     private float _driftSign;
     private float _driftTimer;
+    private float _proximityCooldown;
 
     public MeleeIdleState(EnemyBrain brain) : base(brain) { }
 
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Idle;
-
+        _proximityCooldown = ProximityAttackCooldown;
         Vector3 toSelf = brain.transform.position - player.position;
         toSelf.y = 0f;
         _angle = Mathf.Atan2(toSelf.z, toSelf.x);
@@ -32,8 +34,18 @@ public class MeleeIdleState : EnemyState
 
     public override void Update()
     {
+        if (_proximityCooldown > 0f)
+            _proximityCooldown -= Time.deltaTime;
+
         float dist = brain.DistanceToPlayer();
         float radius = brain.engageStopDistance * OrbitRadiusMultiplier;
+
+        // Player stepped too close — react immediately.
+        if (_proximityCooldown <= 0f && dist <= brain.proximityAttackRange)
+        {
+            brain.ChangeState(new MeleeEngageState(brain, new MeleeIdleState(brain)));
+            return;
+        }
 
         // Player ran away — chase to close the gap, then resume orbiting.
         if (dist > brain.engageStopDistance * ChaseMultiplier)
@@ -72,10 +84,15 @@ public class MeleeIdleState : EnemyState
 // ─────────────────────────────────────────────────────────────────────────────
 public class MeleeEngageState : EnemyState
 {
+    private readonly EnemyState _resumeState;
     private const float AbandonMultiplier = 4f;
     private bool _attackStarted;
 
-    public MeleeEngageState(EnemyBrain brain) : base(brain) { }
+    public MeleeEngageState(EnemyBrain brain, EnemyState resumeState = null) : base(brain)
+    {
+        _resumeState = resumeState ?? new MeleeIdleState(brain);
+    }
+
 
     public override void Enter()
     {
@@ -127,7 +144,7 @@ public class MeleeEngageState : EnemyState
 
     private void OnPunchFinished()
     {
-        brain.ChangeState(new MeleeIdleState(brain));
+        brain.ChangeState(_resumeState);
     }
 }
 
@@ -179,11 +196,19 @@ public class MeleeRetreatState : EnemyState
 // ─────────────────────────────────────────────────────────────────────────────
 public class GuardState : EnemyState
 {
-    public GuardState(EnemyBrain brain) : base(brain) { }
+    private const float CounterCooldownDuration = 3f;
+
+    private float _counterCooldown;
+
+    public GuardState(EnemyBrain brain, float cooldown = 0f) : base(brain)
+    {
+        _counterCooldown = cooldown;
+    }
 
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Guarding;
+        _counterCooldown = CounterCooldownDuration;
     }
 
     public override void Update()
@@ -197,11 +222,63 @@ public class GuardState : EnemyState
             return;
         }
 
+        if (_counterCooldown > 0f)
+            _counterCooldown -= Time.deltaTime;
+
+        // Player stepped into range — counter attack, then return here.
+        if (_counterCooldown <= 0f && brain.DistanceToPlayer() <= brain.proximityAttackRange)
+        {
+            brain.ChangeState(new GuardCounterState(brain, CounterCooldownDuration));
+            return;
+        }
+
         Vector3 toRanged = (ranged.transform.position - player.position).normalized;
         Vector3 goalPosition = ranged.transform.position - toRanged * brain.guardOffset;
 
         if ((goalPosition - brain.transform.position).magnitude > 0.3f)
             brain.MoveTo(goalPosition, brain.guardSpeed);
+    }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+// GUARD COUNTER
+// A punch performed while on guard duty. Can only be entered from GuardState
+// and always returns to GuardState. Never interacts with the AI loop.
+//
+// Carries the cooldown duration so GuardState can resume with it and prevent
+// immediate re-triggering without needing shared state on EnemyBrain.
+// ─────────────────────────────────────────────────────────────────────────────
+public class GuardCounterState : EnemyState
+{
+    private readonly float _cooldown;
+    private bool _completed;
+
+    public GuardCounterState(EnemyBrain brain, float cooldown) : base(brain)
+    {
+        _cooldown = cooldown;
+    }
+
+    public override void Enter()
+    {
+        brain.Phase = EnemyPhase.Guarding;
+        brain.StopMoving();
+        _completed = false;
+
+        // Subscribe before PlayPunch so no event is missed
+        brain.EnemyAnimator.OnPunchComplete += OnPunchFinished;
+        brain.EnemyAnimator.PlayPunch();
+    }
+
+    public override void Exit()
+    {
+        brain.EnemyAnimator.OnPunchComplete -= OnPunchFinished;
+    }
+
+    private void OnPunchFinished()
+    {
+        // Guard against the animator firing the event twice
+        if (_completed) return;
+        _completed = true;
+        brain.ChangeState(new GuardState(brain, _cooldown));
     }
 }
 
