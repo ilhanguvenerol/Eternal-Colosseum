@@ -105,12 +105,6 @@ public class MeleeEngageState : EnemyState
 
     public override void Update()
     {
-        if (brain.DistanceToPlayer() <= brain.proximityAttackRange)
-        {
-            brain.ChangeState(new MeleeEngageState(brain));
-            return;
-        }
-
         if (_attackStarted) return;
 
         float dist = brain.DistanceToPlayer();
