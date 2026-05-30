@@ -24,7 +24,7 @@ public class MeleeIdleState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Idle;
-
+        _proximityCooldown = ProximityAttackCooldown;
         Vector3 toSelf = brain.transform.position - player.position;
         toSelf.y = 0f;
         _angle = Mathf.Atan2(toSelf.z, toSelf.x);
@@ -34,6 +34,9 @@ public class MeleeIdleState : EnemyState
 
     public override void Update()
     {
+        if (_proximityCooldown > 0f)
+            _proximityCooldown -= Time.deltaTime;
+
         float dist = brain.DistanceToPlayer();
         float radius = brain.engageStopDistance * OrbitRadiusMultiplier;
 
@@ -205,6 +208,7 @@ public class GuardState : EnemyState
     public override void Enter()
     {
         brain.Phase = EnemyPhase.Guarding;
+        _counterCooldown = CounterCooldownDuration;
     }
 
     public override void Update()
@@ -217,6 +221,9 @@ public class GuardState : EnemyState
             brain.ChangeState(new MeleeIdleState(brain));
             return;
         }
+
+        if (_counterCooldown > 0f)
+            _counterCooldown -= Time.deltaTime;
 
         // Player stepped into range — counter attack, then return here.
         if (_counterCooldown <= 0f && brain.DistanceToPlayer() <= brain.proximityAttackRange)
@@ -243,6 +250,7 @@ public class GuardState : EnemyState
 public class GuardCounterState : EnemyState
 {
     private readonly float _cooldown;
+    private bool _completed;
 
     public GuardCounterState(EnemyBrain brain, float cooldown) : base(brain)
     {
@@ -251,9 +259,11 @@ public class GuardCounterState : EnemyState
 
     public override void Enter()
     {
-        brain.Phase = EnemyPhase.Guarding; // stays guarding — AI loop ignores this enemy
+        brain.Phase = EnemyPhase.Guarding;
         brain.StopMoving();
+        _completed = false;
 
+        // Subscribe before PlayPunch so no event is missed
         brain.EnemyAnimator.OnPunchComplete += OnPunchFinished;
         brain.EnemyAnimator.PlayPunch();
     }
@@ -265,7 +275,9 @@ public class GuardCounterState : EnemyState
 
     private void OnPunchFinished()
     {
-        // Return to guard duty with the cooldown intact.
+        // Guard against the animator firing the event twice
+        if (_completed) return;
+        _completed = true;
         brain.ChangeState(new GuardState(brain, _cooldown));
     }
 }
