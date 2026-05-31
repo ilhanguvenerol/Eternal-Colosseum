@@ -190,6 +190,14 @@ public class EnemyBrain : MonoBehaviour
     {
         if (!_initialised || Player == null) return;
 
+        float distanceToPlayer = DistanceToPlayer();
+
+        if (distanceToPlayer > engageStopDistance + 0.5f)
+        {
+            Debug.Log("[Enemy] Attack missed - player out of range.");
+            return;
+        }
+
         PlayerCombatState playerCombat = Player.GetComponent<PlayerCombatState>();
 
         if (playerCombat != null && playerCombat.IsParrying)
