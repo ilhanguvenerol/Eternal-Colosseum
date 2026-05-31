@@ -40,6 +40,9 @@ public class EnemyBrain : MonoBehaviour
     public float disengageThreshold = 3f;
     public float guardOffset = 1.2f;
 
+    [Header("Ranged")]
+    public float fireRate = 2f; // seconds between shots in LooseState
+
     // ── Phase ─────────────────────────────────────────────────────────────────
 
     /// <summary>Set by each state in Enter(). Read by EnemyManager.</summary>
