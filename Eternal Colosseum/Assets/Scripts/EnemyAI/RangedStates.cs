@@ -39,11 +39,22 @@ public class RangedEngageState : EnemyState
 // ─────────────────────────────────────────────────────────────────────────────
 public class LooseState : EnemyState
 {
+    private const float DrawTime = 1.8f; // seconds to hold draw before releasing
+
+    private enum FirePhase { Idle, Drawing, Loosing }
+    private FirePhase _phase;
+
     public LooseState(EnemyBrain brain) : base(brain) { }
 
     public override void Enter()
     {
         brain.StopMoving();
+
+        brain.EnemyAnimator.OnLoose += OnArrowReleased;
+        brain.EnemyAnimator.OnLooseComplete += OnLooseAnimationComplete;
+
+        BeginDraw();
+
     }
 
     public override void Update()
@@ -64,7 +75,55 @@ public class LooseState : EnemyState
             return;
         }
 
-        // Stand still and fire — attack component reads this state via IsInLoose()
+    }
+    public override void Exit()
+    {
+        brain.EnemyAnimator.OnLoose -= OnArrowReleased;
+        brain.EnemyAnimator.OnLooseComplete -= OnLooseAnimationComplete;
+        brain.StopMoving();
+    }
+
+    private void BeginDraw()
+    {
+        _phase = FirePhase.Drawing;
+        brain.EnemyAnimator.PlayDrawBow();
+        // Wait DrawTime then release — use a coroutine on the brain
+        brain.StartCoroutine(ReleaseAfterDraw());
+    }
+
+    private System.Collections.IEnumerator ReleaseAfterDraw()
+    {
+        yield return new WaitForSeconds(DrawTime);
+
+        // Only release if still in this state — guard against state change mid-draw
+        if (_phase != FirePhase.Drawing) yield break;
+
+        _phase = FirePhase.Loosing;
+        brain.EnemyAnimator.PlayLoose();
+    }
+
+    private void OnArrowReleased()//for whomever will handle damage connection
+    {
+        // Arrow spawning logic hooks here from a separate attack component.
+        // LooseState does not own damage — it only drives the animation cycle.
+    }
+
+    private void OnLooseAnimationComplete()
+    {
+        if (_phase != FirePhase.Loosing) return;
+
+        // Loose clip finished — wait fireRate seconds then draw again
+        brain.StartCoroutine(WaitThenDraw());
+    }
+
+    private System.Collections.IEnumerator WaitThenDraw()
+    {
+        yield return new WaitForSeconds(brain.fireRate);
+
+        // Only redraw if still in this state
+        if (brain.Phase != EnemyPhase.Idle) yield break;
+
+        BeginDraw();
     }
 
     private bool HasGuard() => brain.HasGuardAssigned();
