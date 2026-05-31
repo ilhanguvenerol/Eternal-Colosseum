@@ -39,9 +39,13 @@ namespace EternalColosseum.EnemyAI
         public Transform    Player;
 
         // ── Public API ────────────────────────────────────────────────────────
+        // Initialize the encounter based on the current level and stage tracked by the GameLoopManager.
         private void Start()
         {
-            SpawnWave(5, 2);
+            SpawnWave(
+                GameLoopManager.Instance.currentLevel,
+                GameLoopManager.Instance.currentStage
+            );
         }
         /// <summary>
         /// Spawns a wave for the given level and stage.

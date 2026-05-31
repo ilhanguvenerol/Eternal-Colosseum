@@ -58,7 +58,7 @@ public class ShopManager : MonoBehaviour
         if(slotBackground1 != null) originalSlotColor = slotBackground1.color;
 
         if (shopPanel != null)
-            shopPanel.SetActive(false);
+            shopPanel.SetActive(true);
 
         StartCoroutine(InitShop());
     }
