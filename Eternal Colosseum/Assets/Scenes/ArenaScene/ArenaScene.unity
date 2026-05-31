@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StarterEquipment
   starterSword: {fileID: 11400000, guid: 0a435dd1d3133204798e10222c1fde13, type: 2}
+  starterItems: []
 --- !u!114 &122341370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1180,9 +1181,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.SpawnManager
   MeleePrefab: {fileID: 6018979999398995438, guid: e9812a9ef01e67748867d9a6431ff32f, type: 3}
-  RangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
-  CelestialMeleePrefab: {fileID: 1859766477297938151, guid: a43762024db85c345a6584145fd2330b, type: 3}
-  CelestialRangedPrefab: {fileID: 1859766477297938151, guid: 551f11c8d10414b4686887f8a011942b, type: 3}
+  RangedPrefab: {fileID: 6018979999398995438, guid: 41a3bd1da61deb144ae1b677aaaf84ca, type: 3}
+  CelestialMeleePrefab: {fileID: 6018979999398995438, guid: e9812a9ef01e67748867d9a6431ff32f, type: 3}
+  CelestialRangedPrefab: {fileID: 6018979999398995438, guid: 41a3bd1da61deb144ae1b677aaaf84ca, type: 3}
   SpawnPoints:
   - {fileID: 915084374}
   - {fileID: 756643092}
