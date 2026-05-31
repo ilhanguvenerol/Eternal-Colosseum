@@ -61,6 +61,14 @@ public class EnemyManager : MonoBehaviour
     {
         _all.Remove(dead);
 
+        // Notify game looğ when the wave has been fully cleared.
+        if (_all.Count == 0)
+        {
+            Debug.Log("[GAME LOOP] Wave Complete!");
+            GameLoopManager.Instance.OnWaveCompleted();
+            return;
+        }
+
         if (dead.enemyType == EnemyType.Ranged)
         {
             foreach (EnemyBrain b in _all)
