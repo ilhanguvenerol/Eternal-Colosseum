@@ -5,6 +5,7 @@ public class GameLoopManager : MonoBehaviour
 {
     public static GameLoopManager Instance;
     public WaveClearUI waveClearUI;
+    public VictoryUI victoryUI;
 
     public int currentLevel = 1;
     public int currentStage = 1;
@@ -25,6 +26,12 @@ public class GameLoopManager : MonoBehaviour
     public void OnWaveCompleted()
     {
         Debug.Log("[GAME LOOP] Wave Complete!");
+
+        if (currentLevel >= 16 && currentStage >= 4)
+        {
+            victoryUI.ShowVictory();
+            return;
+        }
 
         waveClearUI.ShowWaveClear();
     }
