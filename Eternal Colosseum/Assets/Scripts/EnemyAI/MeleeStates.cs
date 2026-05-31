@@ -307,19 +307,19 @@ public class StunnedState : EnemyState
         brain.Phase = EnemyPhase.Stunned;
         brain.StopMoving();
 
-        if (brain.EnemyAnimator != null)
-            brain.EnemyAnimator.OnHitComplete += OnHitAnimationFinished;
-        else
-            OnHitAnimationFinished(); // Instantly un-stun if missing component
+        brain.EnemyAnimator.OnHitComplete += OnAnimationFinished;
+        brain.EnemyAnimator.OnStunnedComplete += OnAnimationFinished;
+
     }
 
     public override void Exit()
     {
-        if (brain.EnemyAnimator != null)
-            brain.EnemyAnimator.OnHitComplete -= OnHitAnimationFinished;
+        brain.EnemyAnimator.OnHitComplete -= OnAnimationFinished;
+        brain.EnemyAnimator.OnStunnedComplete -= OnAnimationFinished;
+
     }
 
-    private void OnHitAnimationFinished()
+    private void OnAnimationFinished()
     {
         brain.ChangeState(_resumeState);
     }

@@ -1572,7 +1572,7 @@ ModelImporter:
       - time: 0.9912807
         functionName: AnimEvent_HitComplete
         data: 
-        objectReferenceParameter: {instanceID: 0}
+        objectReferenceParameter: {fileID: 11500000, guid: f4b46da4418fa1b4eacbaf769f74592b, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

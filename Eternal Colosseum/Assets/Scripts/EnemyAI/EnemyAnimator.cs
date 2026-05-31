@@ -65,6 +65,7 @@ public class EnemyAnimator : MonoBehaviour
     private static readonly int DeathHash = Animator.StringToHash("Death");
     private static readonly int DrawBowHash = Animator.StringToHash("DrawBow");
     private static readonly int LooseHash = Animator.StringToHash("Loose");
+    private static readonly int StunnedHash = Animator.StringToHash("Stunned");
 
     // ── Callbacks — subscribe from EnemyBrain / attack components ────────────
 
@@ -85,6 +86,9 @@ public class EnemyAnimator : MonoBehaviour
 
     public System.Action OnLoose; // fires arrow here
     public System.Action OnLooseComplete; // LooseState hooks here to know when to fire again
+
+    public System.Action OnStunnedComplete;
+
     // ── Internal ──────────────────────────────────────────────────────────────
     private Animator _animator;
     private bool _dead;
@@ -128,7 +132,18 @@ public class EnemyAnimator : MonoBehaviour
         _animator.ResetTrigger(PunchHash);
         _animator.ResetTrigger(DrawBowHash);
         _animator.ResetTrigger(LooseHash);
+        _animator.ResetTrigger(StunnedHash);
         _animator.SetTrigger(HitHash);
+    }
+
+    public void PlayStunned()
+    {
+        if (_dead) return;
+        _animator.ResetTrigger(PunchHash);
+        _animator.ResetTrigger(DrawBowHash);
+        _animator.ResetTrigger(LooseHash);
+        _animator.ResetTrigger(HitHash);
+        _animator.SetTrigger(StunnedHash);
     }
 
     /// <summary>Fires death. All further API calls are silently ignored.</summary>
@@ -139,6 +154,7 @@ public class EnemyAnimator : MonoBehaviour
         _animator.ResetTrigger(HitHash);
         _animator.ResetTrigger(DrawBowHash);
         _animator.ResetTrigger(LooseHash);
+        _animator.ResetTrigger(StunnedHash);
         _animator.SetTrigger(DeathHash);
     }
 
@@ -167,6 +183,8 @@ public class EnemyAnimator : MonoBehaviour
 
     public void AnimEvent_Loose() => OnLoose?.Invoke();
     public void AnimEvent_LooseComplete() => OnLooseComplete?.Invoke();
+
+    public void AnimEvent_StunnedComplete() => OnStunnedComplete?.Invoke();
     // ── Helper ────────────────────────────────────────────────────────────────
     public bool IsDead => _dead;
 }
