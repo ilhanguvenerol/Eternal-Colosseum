@@ -169,6 +169,8 @@ public class EnemyBrain : MonoBehaviour
 
     public void OnParried()
     {
+        EnemyAnimator?.PlayStunned();
+
         Debug.Log("[Enemy] Attack parried!");
 
         EnemyState resumeState = enemyType == EnemyType.Melee
