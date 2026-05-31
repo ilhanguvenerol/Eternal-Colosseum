@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class GameLoopManager : MonoBehaviour
 {
     public static GameLoopManager Instance;
+    public WaveClearUI waveClearUI;
 
     public int currentLevel = 1;
     public int currentStage = 1;
@@ -25,7 +26,7 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log("[GAME LOOP] Wave Complete!");
 
-        LoadShop();
+        waveClearUI.ShowWaveClear();
     }
 
     public void LoadShop()
