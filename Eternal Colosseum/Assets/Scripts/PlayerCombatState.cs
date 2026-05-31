@@ -81,19 +81,22 @@ public class PlayerCombatState : MonoBehaviour
         PlayerMana playerMana = _player.GetComponent<PlayerMana>();
 
         Collider[] hits = Physics.OverlapSphere(_player.transform.position, 4f);
-
+        
         System.Collections.Generic.HashSet<EnemyHealth> damagedEnemies =
             new System.Collections.Generic.HashSet<EnemyHealth>();
 
         foreach (Collider hit in hits)
         {
-            EnemyHealth enemy = null;
+            // Ignore player itself
+            if (hit.CompareTag("Player")) continue;
 
-            if (hit.transform.parent != null)
-                enemy = hit.transform.parent.GetComponentInParent<EnemyHealth>();
+            // Ignore enemy projectiles
+            if (hit.GetComponentInParent<EnemyProjectile>() != null) continue;
 
-            if (enemy == null && hit.transform.root != null)
-                enemy = hit.transform.root.GetComponentInChildren<EnemyHealth>();
+            EnemyHealth enemy = hit.GetComponentInParent<EnemyHealth>();
+
+            if (enemy == null)
+                enemy = hit.GetComponent<EnemyHealth>();
 
             if (enemy != null && !enemy.IsDead && !damagedEnemies.Contains(enemy))
             {

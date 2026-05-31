@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
@@ -8,6 +9,9 @@ public class EnemyHealth : MonoBehaviour
     [Header("Health Settings")]
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float manaRewardOnHit = 15f;
+
+    [Header("Death Settings")]
+    [SerializeField] private float deathDisableDelay = 1.5f;
 
     // ─────────────────────────────────────────
     //  Private State
@@ -51,18 +55,31 @@ public class EnemyHealth : MonoBehaviour
     // ─────────────────────────────────────────
     private void Die()
     {
-        isDead = true;
+        if (isDead) return;
 
-        // Disable FIRST so OverlapSphere-based items (PyreWraith, AshpyreDust)
-        // cannot find this enemy as a target during chain reactions.
-        gameObject.SetActive(false);
+        isDead = true;
 
         Debug.Log("[Enemy] Düşman öldü!");
 
-        // 1. Trigger kill items
+        // 1. Trigger death animation and stop AI
+        EnemyBrain brain = GetComponent<EnemyBrain>();
+
+        if (brain != null)
+        {
+            brain.OnDeath();
+
+            // Notify AI manager so the turn loop doesn't crash
+            EnemyManager manager = Object.FindAnyObjectByType<EnemyManager>();
+
+            if (manager != null)
+                manager.OnEnemyDied(brain);
+        }
+
+        // 2. Trigger kill items
         if (Inventory.Instance != null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+
             if (playerObj != null)
             {
                 foreach (ItemData item in Inventory.Instance.ownedItems)
@@ -70,13 +87,13 @@ public class EnemyHealth : MonoBehaviour
             }
         }
 
-        // 2. Notify AI manager so the turn loop doesn't crash
-        EnemyBrain brain = GetComponent<EnemyBrain>();
-        if (brain != null)
-        {
-            EnemyManager manager = Object.FindAnyObjectByType<EnemyManager>();
-            if (manager != null)
-                manager.OnEnemyDied(brain);
-        }
+        // 3. Disable after death animation finishes
+        StartCoroutine(DisableAfterDeathAnimation());
+    }
+
+    private IEnumerator DisableAfterDeathAnimation()
+    {
+        yield return new WaitForSeconds(deathDisableDelay);
+        gameObject.SetActive(false);
     }
 }
