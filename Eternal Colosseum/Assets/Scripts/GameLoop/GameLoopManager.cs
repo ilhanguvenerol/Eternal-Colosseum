@@ -33,6 +33,19 @@ public class GameLoopManager : MonoBehaviour
         SceneManager.LoadScene("ShopScene");
     }
 
+    public void AdvanceStage()
+    {
+        currentStage++;
+
+        if (currentStage > 3)
+        {
+            currentStage = 1;
+            currentLevel++;
+        }
+
+        Debug.Log($"[GAME LOOP] Level {currentLevel} Stage {currentStage}");
+    }
+    
     public void LoadArena()
     {
         SceneManager.LoadScene("ArenaScene");

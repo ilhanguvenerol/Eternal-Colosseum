@@ -41,7 +41,10 @@ namespace EternalColosseum.EnemyAI
         // ── Public API ────────────────────────────────────────────────────────
         private void Start()
         {
-            SpawnWave(5, 2);
+            SpawnWave(
+                GameLoopManager.Instance.currentLevel,
+                GameLoopManager.Instance.currentStage
+            );
         }
         /// <summary>
         /// Spawns a wave for the given level and stage.

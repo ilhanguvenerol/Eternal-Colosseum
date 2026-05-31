@@ -6,6 +6,7 @@ public class ShopContinueButton : MonoBehaviour
     {
         Debug.Log("[GAME LOOP] Continue pressed");
 
+        GameLoopManager.Instance.AdvanceStage();
         GameLoopManager.Instance.LoadArena();
     }
 }
