@@ -38,7 +38,7 @@ public class GameLoopManager : MonoBehaviour
     {
         currentStage++;
 
-        if (currentStage > 3)
+        if (currentStage > 4)
         {
             currentStage = 1;
             currentLevel++;
