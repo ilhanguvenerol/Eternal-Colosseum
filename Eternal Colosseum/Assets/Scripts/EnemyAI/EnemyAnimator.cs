@@ -63,6 +63,8 @@ public class EnemyAnimator : MonoBehaviour
     private static readonly int PunchHash = Animator.StringToHash("Punch");
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DeathHash = Animator.StringToHash("Death");
+    private static readonly int DrawBowHash = Animator.StringToHash("DrawBow");
+    private static readonly int LooseHash = Animator.StringToHash("Loose");
 
     // ── Callbacks — subscribe from EnemyBrain / attack components ────────────
 
@@ -81,6 +83,8 @@ public class EnemyAnimator : MonoBehaviour
     /// </summary>
     public System.Action OnHitComplete;
 
+    public System.Action OnLoose; // fires arrow here
+    public System.Action OnLooseComplete; // LooseState hooks here to know when to fire again
     // ── Internal ──────────────────────────────────────────────────────────────
     private Animator _animator;
     private bool _dead;
@@ -122,6 +126,8 @@ public class EnemyAnimator : MonoBehaviour
     {
         if (_dead) return;
         _animator.ResetTrigger(PunchHash);
+        _animator.ResetTrigger(DrawBowHash);
+        _animator.ResetTrigger(LooseHash);
         _animator.SetTrigger(HitHash);
     }
 
@@ -131,9 +137,23 @@ public class EnemyAnimator : MonoBehaviour
         _dead = true;
         _animator.ResetTrigger(PunchHash);
         _animator.ResetTrigger(HitHash);
+        _animator.ResetTrigger(DrawBowHash);
+        _animator.ResetTrigger(LooseHash);
         _animator.SetTrigger(DeathHash);
     }
 
+    public void PlayDrawBow()
+    {
+        if (_dead) return;
+        _animator.ResetTrigger(LooseHash);
+        _animator.SetTrigger(DrawBowHash);
+    }
+
+    public void PlayLoose()
+    {
+        if (_dead) return;
+        _animator.SetTrigger(LooseHash);
+    }
     // ── Animation Events — placed in clips via the Animation window ───────────
 
     /// <summary>Place at the impact frame of the Punch clip.</summary>
@@ -145,6 +165,8 @@ public class EnemyAnimator : MonoBehaviour
     /// <summary>Place at the last frame of the Hit clip.</summary>
     public void AnimEvent_HitComplete() => OnHitComplete?.Invoke();
 
+    public void AnimEvent_Loose() => OnLoose?.Invoke();
+    public void AnimEvent_LooseComplete() => OnLooseComplete?.Invoke();
     // ── Helper ────────────────────────────────────────────────────────────────
     public bool IsDead => _dead;
 }

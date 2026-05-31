@@ -41,6 +41,9 @@ public class EnemyBrain : MonoBehaviour
     public float guardOffset = 1.2f;
     public float proximityAttackRange = 2.5f; // idles and guards react if player steps inside
 
+    [Header("Ranged")]
+    public float fireRate = 2f; // seconds between shots in LooseState
+
     // ── Phase ─────────────────────────────────────────────────────────────────
 
     /// <summary>Set by each state in Enter(). Read by EnemyManager.</summary>
