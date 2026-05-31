@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// Handles core game flow: arena, shop, progression, and end-game states.
 public class GameLoopManager : MonoBehaviour
 {
     public static GameLoopManager Instance;
@@ -27,6 +28,7 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log("[GAME LOOP] Wave Complete!");
 
+        // Final encounter cleared -> show victory instead of returning to the shop.
         if (currentLevel >= 16 && currentStage >= 4)
         {
             victoryUI.ShowVictory();
@@ -45,6 +47,7 @@ public class GameLoopManager : MonoBehaviour
     {
         currentStage++;
 
+        // Progress through 4 stages before advancing to the next level.
         if (currentStage > 4)
         {
             currentStage = 1;

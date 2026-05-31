@@ -10,6 +10,7 @@ public class WaveClearUI : MonoBehaviour
         StartCoroutine(ShowRoutine());
     }
 
+    // Brief transition screen shown before loading the shop scene.
     IEnumerator ShowRoutine()
     {
         waveClearPanel.SetActive(true);

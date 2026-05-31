@@ -11,6 +11,7 @@ public class GameOverUI : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    // Display the game over screen and pause gameplay.
     public void RetryLevel()
     {
         Time.timeScale = 1f;
