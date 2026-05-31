@@ -28,14 +28,30 @@ public class BossBrain : MonoBehaviour
     [Header("Telegraph")]
     [SerializeField] private float heavyTelegraphTime = 0.8f;
     [SerializeField] private float dashTelegraphTime = 0.5f;
+    
+    // animator parameters
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int LightAttackHash = Animator.StringToHash("LightAttack");
+    private static readonly int HeavyWindupHash = Animator.StringToHash("HeavyWindup");
+    private static readonly int HeavyAttackHash = Animator.StringToHash("HeavyAttack");
+    private static readonly int DashWindupHash = Animator.StringToHash("DashWindup");
+    private static readonly int DashAttackHash = Animator.StringToHash("DashAttack");
+    private static readonly int HitHash = Animator.StringToHash("Hit");
+    private static readonly int DeathHash = Animator.StringToHash("Death");
 
     private NavMeshAgent agent;
+    private Animator animator;
+
     private bool isAttacking;
     private float nextAttackTime;
+    private bool isDead;
+
+    private float _pendingDamage;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
 
         if (agent != null)
         {
@@ -57,11 +73,14 @@ public class BossBrain : MonoBehaviour
 
     private void Update()
     {
-        if (player == null || isAttacking) return;
+        if (player == null || isAttacking || isDead) return;
 
         FacePlayer();
 
         float distance = Vector3.Distance(transform.position, player.position);
+
+        float speed = agent != null ? agent.velocity.magnitude : 0f;
+        animator.SetFloat(SpeedHash, speed, 0.1f, Time.deltaTime);
 
         if (distance > attackRange)
         {
@@ -98,32 +117,42 @@ public class BossBrain : MonoBehaviour
         switch (attackType)
         {
             case BossAttackType.LightAttack:
+                animator.SetTrigger(LightAttackHash);
+                _pendingDamage = lightAttackDamage;
                 Debug.Log("[Boss] Light Attack");
                 yield return new WaitForSeconds(0.35f);
-                DealDamage(lightAttackDamage);
                 break;
 
             case BossAttackType.HeavyAttack:
-                Debug.Log("[Boss] Heavy Attack Telegraph");
+                // Step 1 — play telegraph, hold on last frame
+                animator.SetTrigger(HeavyWindupHash);
                 yield return new WaitForSeconds(heavyTelegraphTime);
-                Debug.Log("[Boss] Heavy Attack Hit");
-                DealDamage(heavyAttackDamage);
+                // Step 2 — release into the heavy swing
+                _pendingDamage = heavyAttackDamage;
+                animator.SetTrigger(HeavyAttackHash);
+                yield return new WaitForSeconds(0.5f);
+                // AnimEvent fires at impact frame of HeavyAttack clip
                 break;
 
             case BossAttackType.DashAttack:
-                Debug.Log("[Boss] Dash Attack Telegraph");
+                // Step 1 — play telegraph, hold on last frame
+                animator.SetTrigger(DashWindupHash);
                 yield return new WaitForSeconds(dashTelegraphTime);
+                // Step 2 — dash and release into the lunge
                 DashTowardPlayer();
-                yield return new WaitForSeconds(0.25f);
-                DealDamage(dashAttackDamage);
+                _pendingDamage = dashAttackDamage;
+                animator.SetTrigger(DashAttackHash);
+                yield return new WaitForSeconds(0.4f);
+                // AnimEvent fires at impact frame of DashAttack clip
                 break;
+
         }
 
         nextAttackTime = Time.time + attackCooldown;
         isAttacking = false;
     }
 
-    private void DealDamage(float damage)
+    public void AnimEvent_DealDamage(float damage)
     {
         if (player == null) return;
 
@@ -143,9 +172,31 @@ public class BossBrain : MonoBehaviour
 
         if (playerHealth != null)
         {
-            playerHealth.TakeDamage(damage);
-            Debug.Log($"[Boss] Player hit for {damage} damage.");
+            playerHealth.TakeDamage(_pendingDamage);
+            Debug.Log($"[Boss] Player hit for {_pendingDamage} damage.");
         }
+
+        _pendingDamage = 0f;
+    }
+
+    //Public hit/death entry points
+    //when the boss takes a hit
+    public void OnHit()
+    {
+        if (isDead) return;
+        ResetAttackTriggers();
+        animator.SetTrigger(HitHash);
+    }
+
+    //when the boss dies
+    public void OnDeath()
+    {
+        if (isDead) return;
+        isDead = true;
+        isAttacking = true; // prevents Update from starting new attacks
+        StopMoving();
+        ResetAttackTriggers();
+        animator.SetTrigger(DeathHash);
     }
 
     private void MoveToPlayer()
@@ -188,4 +239,14 @@ public class BossBrain : MonoBehaviour
             rotationSpeed * Time.deltaTime
         );
     }
+
+    private void ResetAttackTriggers()
+    {
+        animator.ResetTrigger(LightAttackHash);
+        animator.ResetTrigger(HeavyWindupHash);
+        animator.ResetTrigger(HeavyAttackHash);
+        animator.ResetTrigger(DashWindupHash);
+        animator.ResetTrigger(DashAttackHash);
+    }
+
 }
