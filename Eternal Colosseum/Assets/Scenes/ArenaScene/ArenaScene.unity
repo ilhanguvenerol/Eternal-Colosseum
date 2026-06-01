@@ -1574,8 +1574,20 @@ PrefabInstance:
       value: 36
       objectReference: {fileID: 0}
     - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_margin.w
+      value: -57.10858
+      objectReference: {fileID: 0}
+    - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_margin.x
+      value: -41.561035
+      objectReference: {fileID: 0}
+    - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_margin.y
+      value: -65.692505
+      objectReference: {fileID: 0}
+    - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_margin.z
-      value: 104.580124
+      value: 69.587326
       objectReference: {fileID: 0}
     - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_fontAsset
@@ -1604,6 +1616,14 @@ PrefabInstance:
     - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2333135231550077415, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
@@ -1695,11 +1715,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5157090508848083613, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_margin.w
-      value: -41.86267
+      value: -147.27301
+      objectReference: {fileID: 0}
+    - target: {fileID: 5157090508848083613, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_margin.x
+      value: 29.673187
+      objectReference: {fileID: 0}
+    - target: {fileID: 5157090508848083613, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
+      propertyPath: m_margin.y
+      value: -113.8736
       objectReference: {fileID: 0}
     - target: {fileID: 5157090508848083613, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_margin.z
-      value: -116.875336
+      value: -293.97052
       objectReference: {fileID: 0}
     - target: {fileID: 5157090508848083613, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_fontAsset
@@ -1767,11 +1795,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8126802187555472692, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -158
+      value: -261
       objectReference: {fileID: 0}
     - target: {fileID: 8126802187555472692, guid: 87f9f19fc29e94a2881b71aba208148e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 120
+      value: 118
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
