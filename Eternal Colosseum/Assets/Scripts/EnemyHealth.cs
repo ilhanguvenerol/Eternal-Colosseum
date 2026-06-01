@@ -75,6 +75,15 @@ public class EnemyHealth : MonoBehaviour
                 manager.OnEnemyDied(brain);
         }
 
+        BossBrain boss = GetComponent<BossBrain>();
+
+        if (boss != null)
+        {
+            boss.OnDeath();
+
+            GameLoopManager.Instance.OnWaveCompleted();
+        }
+
         // 2. Trigger kill items
         if (Inventory.Instance != null)
         {
