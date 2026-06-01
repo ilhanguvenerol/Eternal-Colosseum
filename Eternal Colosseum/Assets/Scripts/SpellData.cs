@@ -1,8 +1,4 @@
-﻿// SpellData.cs
-// Create one ScriptableObject asset per spell.
-// Right-click in Project → Create → Combat → Spell Data
-
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "Combat/Spell Data")]
 public class SpellData : ScriptableObject
@@ -10,13 +6,20 @@ public class SpellData : ScriptableObject
     [Header("Identity")]
     public string SpellName;
 
-    [Header("Animation")]
-    public AnimationClip CastAnimation;   // the unique clip for this spell
+    [Tooltip("Match this number to the CombatState value in the Animator graph (e.g., 3 for Consume)")]
+    public int AnimatorCombatState = 3;
 
-    // ── Extend here later ─────────────────────────────────────────────────────
-    // public float        CastTime;
-    // public float        ManaCost;
-    // public GameObject   ProjectilePrefab;
-    // public AudioClip    CastSound;
-    // public ParticleSystem CastVFX;
+    [Header("Animation")]
+    public AnimationClip CastAnimation;
+
+    [Header("Spell Costs")]
+    public float ManaCost = 20f;
+
+    /// <summary>
+    /// STRATEGY PATTERN: Overridden by individual spells to execute unique behavior.
+    /// </summary>
+    public virtual void ExecuteSpell(GameObject caster)
+    {
+        // Base behavior
+    }
 }

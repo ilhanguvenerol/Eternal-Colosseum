@@ -15,6 +15,11 @@ public class PlayerMana : MonoBehaviour
     public float CurrentMana => currentMana;
     public float MaxMana     => maxMana;
 
+    private void Awake()
+    {
+        currentMana = maxMana;
+    }
+
     public void GainMana(float amount)
     {
         if (currentMana >= maxMana) return;
