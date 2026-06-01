@@ -202,10 +202,16 @@ public class EnemyBrain : MonoBehaviour
 
         PlayerCombatState playerCombat = Player.GetComponent<PlayerCombatState>();
 
-        if (playerCombat != null && playerCombat.IsParrying)
+        if (playerCombat.IsParrying)
         {
-            OnParried();
-            return;
+            Vector3 directionToEnemy = (transform.position - Player.position).normalized;
+            float dot = Vector3.Dot(Player.forward, directionToEnemy);
+
+            if (dot > 0.5f) // Enemy is roughly within 60° in front of player
+            {
+                OnParried();
+                return;
+            }
         }
 
         PlayerHealth playerHealth = Player.GetComponent<PlayerHealth>();

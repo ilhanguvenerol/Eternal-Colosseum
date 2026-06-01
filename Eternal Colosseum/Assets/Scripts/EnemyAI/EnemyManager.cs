@@ -61,7 +61,7 @@ public class EnemyManager : MonoBehaviour
     {
         _all.Remove(dead);
 
-        // Notify game looğ when the wave has been fully cleared.
+        // Notify game loop when the wave has been fully cleared.
         if (_all.Count == 0)
         {
             Debug.Log("[GAME LOOP] Wave Complete!");
