@@ -127,4 +127,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectile
   speed: 18
   lifeTime: 4
-  damage: 10
+  damage: 8

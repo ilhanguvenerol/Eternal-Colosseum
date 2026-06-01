@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 985a10bd0a80b1445816c5ae9c28bb25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 100
+  maxHealth: 17
   manaRewardOnHit: 15
   deathDisableDelay: 1.5
 --- !u!195 &806198069108988180
