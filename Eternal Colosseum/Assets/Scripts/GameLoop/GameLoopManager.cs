@@ -28,7 +28,7 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log("[GAME LOOP] Wave Complete!");
 
-        if (currentLevel >= 16 && currentStage >= 4)
+        if (currentLevel >= 4 && currentStage >= 4)
         {
             if (victoryUI != null)
             {
