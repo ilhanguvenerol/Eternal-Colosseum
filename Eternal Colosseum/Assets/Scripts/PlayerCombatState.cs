@@ -138,7 +138,27 @@ public class PlayerCombatState : MonoBehaviour
             Debug.Log("[PlayerCombatState] No spell equipped.");
             return;
         }
+
+        // 1. Check Mana Requirement
+        PlayerMana playerMana = _player.GetComponent<PlayerMana>();
+        if (playerMana != null && !playerMana.HasEnoughMana(_equippedSpell.ManaCost))
+        {
+            Debug.Log("[Spell] Not enough mana to cast " + _equippedSpell.SpellName);
+            return;
+        }
+
+        // 2. DYNAMIC ANIMATION TYPE: Tell the animator exactly which animation state to play!
+        Animator rawAnimator = _player.Animator.GetComponent<Animator>();
+        if (rawAnimator != null)
+        {
+            rawAnimator.SetInteger("CombatState", _equippedSpell.AnimatorCombatState);
+        }
+
+        // 3. Play the spell execution state transitions
         _player.Animator.PlaySpell();
+
+        // 4. Run the spell logic (Applies healing and deducts mana)
+        _equippedSpell.ExecuteSpell(this.gameObject);
     }
 
     private void TryExitSpell()
