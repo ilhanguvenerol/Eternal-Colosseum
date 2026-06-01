@@ -88,7 +88,7 @@ public class PlayerHealth : MonoBehaviour
         lastDamageTime = Time.time;
 
         Debug.Log($"[Health] Hasar alındı: {finalDamage}  |  Kalan HP: {currentHealth}");
-
+        AudioManager.Instance.PlayPlayerHurt();
         onHealthChanged?.Invoke(currentHealth);
         StartCoroutine(InvincibilityRoutine());
 
@@ -102,6 +102,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth + amount, 0f, maxHealth);
         Debug.Log($"[Health] İyileştirildi: {amount}  |  HP: {currentHealth}");
         onHealthChanged?.Invoke(currentHealth);
+        AudioManager.Instance.PlayPlayerHeal();
     }
 
     public void RefreshBonusHealth()

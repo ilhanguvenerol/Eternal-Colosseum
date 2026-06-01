@@ -120,6 +120,7 @@ public class BossBrain : MonoBehaviour
                 animator.SetTrigger(LightAttackHash);
                 _pendingDamage = lightAttackDamage;
                 Debug.Log("[Boss] Light Attack");
+                AudioManager.Instance.PlayBossAttack();
                 yield return new WaitForSeconds(0.35f);
                 break;
 
@@ -130,6 +131,7 @@ public class BossBrain : MonoBehaviour
                 // Step 2 — release into the heavy swing
                 _pendingDamage = heavyAttackDamage;
                 animator.SetTrigger(HeavyAttackHash);
+                AudioManager.Instance.PlayBossAttack();
                 yield return new WaitForSeconds(0.5f);
                 // AnimEvent fires at impact frame of HeavyAttack clip
                 break;
@@ -142,6 +144,7 @@ public class BossBrain : MonoBehaviour
                 DashTowardPlayer();
                 _pendingDamage = dashAttackDamage;
                 animator.SetTrigger(DashAttackHash);
+                AudioManager.Instance.PlayBossAttack();
                 yield return new WaitForSeconds(0.4f);
                 // AnimEvent fires at impact frame of DashAttack clip
                 break;
@@ -186,6 +189,8 @@ public class BossBrain : MonoBehaviour
         if (isDead) return;
         ResetAttackTriggers();
         animator.SetTrigger(HitHash);
+        AudioManager.Instance.PlayBossHurt();
+
     }
 
     //when the boss dies
@@ -197,6 +202,8 @@ public class BossBrain : MonoBehaviour
         StopMoving();
         ResetAttackTriggers();
         animator.SetTrigger(DeathHash);
+        AudioManager.Instance.PlayBossDeath();
+
     }
 
     private void MoveToPlayer()

@@ -46,6 +46,7 @@ namespace EternalColosseum.EnemyAI
                 GameLoopManager.Instance.currentLevel,
                 GameLoopManager.Instance.currentStage
             );
+            AudioManager.Instance.PlayArenaMusic();
         }
         /// <summary>
         /// Spawns a wave for the given level and stage.
