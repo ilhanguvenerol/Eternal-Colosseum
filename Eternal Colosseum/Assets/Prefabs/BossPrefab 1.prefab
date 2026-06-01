@@ -303,6 +303,7 @@ GameObject:
   - component: {fileID: 8384132110945403613}
   - component: {fileID: 5274827079800933396}
   - component: {fileID: 5062536407159281432}
+  - component: {fileID: 654235652066131866}
   m_Layer: 0
   m_Name: BossPrefab 1
   m_TagString: Untagged
@@ -375,6 +376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 100
   manaRewardOnHit: 15
+  deathDisableDelay: 1.5
 --- !u!195 &5274827079800933396
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -413,13 +415,36 @@ MonoBehaviour:
   moveSpeed: 3.5
   rotationSpeed: 10
   stoppingDistance: 2.8
-  lightAttackDamage: 12
-  heavyAttackDamage: 25
-  dashAttackDamage: 18
+  lightAttackDamage: 8
+  heavyAttackDamage: 18
+  dashAttackDamage: 12
   attackCooldown: 2
   attackRange: 3
   heavyTelegraphTime: 0.2
   dashTelegraphTime: 0.5
+--- !u!136 &654235652066131866
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262263521142780142}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1291663004720729418
 GameObject:
   m_ObjectHideFlags: 0

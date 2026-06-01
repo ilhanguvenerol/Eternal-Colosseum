@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3cc370fe57c02c4ba6075a84fc3dc84, type: 3}
   m_Name: WaveScaling
   m_EditorClassIdentifier: Assembly-CSharp::EternalColosseum.EnemyAI.WaveScalingData
-  EnemyCountBase: 5
+  EnemyCountBase: 2
   EnemyCountPerLevel: 0.25
   EnemyCountMin: 2
-  EnemyCountMax: 12
+  EnemyCountMax: 6
   RangedChanceBase: 0.05
   RangedChancePerLevel: 0.015
   RangedChanceMin: 0

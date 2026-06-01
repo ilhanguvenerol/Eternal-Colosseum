@@ -27,6 +27,9 @@ namespace EternalColosseum.EnemyAI
         [Tooltip("Celestial ranged variant. Falls back to RangedPrefab if null.")]
         public GameObject CelestialRangedPrefab;
 
+        [Tooltip("Boss enemy that spawns at stage 4 of each level. Have BossBrain component.")]
+        public GameObject BossPrefab1;
+
         [Header("Spawn Points")]
         [Tooltip("World positions enemies can spawn at. Cycled if count > points.")]
         public Transform[] SpawnPoints;
@@ -55,6 +58,31 @@ namespace EternalColosseum.EnemyAI
         public void SpawnWave(int level, int stage)
         {
             if (!ValidateSetup()) return;
+
+            if (stage == 4)
+            {
+                GameObject boss = Instantiate(
+                    BossPrefab1,
+                    SpawnPoints[0].position,
+                    SpawnPoints[0].rotation,
+                    transform
+                );
+
+                BossBrain bossBrain = boss.GetComponent<BossBrain>();
+
+                if (bossBrain != null)
+                {
+                    GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+
+                    if (playerObj != null)
+                    {
+                        // BossBrain zaten Start'ta player arıyor,
+                        // şimdilik ekstra bir şey yapmayacağız.
+                    }
+                }
+
+                return;
+            }
 
             WaveParameters p = Scaling.Calculate(level, stage);
             Debug.Log($"[SpawnManager] Level {level} Stage {stage} → {p}");

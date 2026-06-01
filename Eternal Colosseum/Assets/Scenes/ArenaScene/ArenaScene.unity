@@ -3705,6 +3705,7 @@ MonoBehaviour:
   RangedPrefab: {fileID: 6018979999398995438, guid: 41a3bd1da61deb144ae1b677aaaf84ca, type: 3}
   CelestialMeleePrefab: {fileID: 6018979999398995438, guid: e9812a9ef01e67748867d9a6431ff32f, type: 3}
   CelestialRangedPrefab: {fileID: 6018979999398995438, guid: 41a3bd1da61deb144ae1b677aaaf84ca, type: 3}
+  BossPrefab1: {fileID: 1262263521142780142, guid: e66d9b8905366474a99f21206e089cfd, type: 3}
   SpawnPoints:
   - {fileID: 915084374}
   - {fileID: 756643092}
