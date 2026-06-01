@@ -80,7 +80,7 @@ public class PlayerCombatState : MonoBehaviour
 
         PlayerMana playerMana = _player.GetComponent<PlayerMana>();
 
-        Collider[] hits = Physics.OverlapSphere(_player.transform.position + new Vector3(1,0,0), 1.5f);
+        Collider[] hits = Physics.OverlapSphere(_player.transform.position + _player.transform.forward * 1.0f, 1.0f);
         
         System.Collections.Generic.HashSet<EnemyHealth> damagedEnemies =
             new System.Collections.Generic.HashSet<EnemyHealth>();
