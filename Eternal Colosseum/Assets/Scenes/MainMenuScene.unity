@@ -908,9 +908,9 @@ MonoBehaviour:
   bossAttack: {fileID: 8300000, guid: bad9b135c021244469e47e4610262a80, type: 3}
   bossHurt: {fileID: 8300000, guid: f6392e003eea6cf43a856b2680f30b95, type: 3}
   bossDeath: {fileID: 8300000, guid: f6392e003eea6cf43a856b2680f30b95, type: 3}
-  arenaMusic: {fileID: 0}
-  shopMusic: {fileID: 0}
-  mainMenuMusic: {fileID: 0}
+  arenaMusic: {fileID: 8300000, guid: 9d2819b7ed9207048b113860cd5d1920, type: 3}
+  shopMusic: {fileID: 8300000, guid: 2b1c497f40f78c84f8e553b8f685a805, type: 3}
+  mainMenuMusic: {fileID: 8300000, guid: d9415d64e13fd1b429b00c7ec2522958, type: 3}
   itemPickup: {fileID: 0}
   itemProc: {fileID: 0}
 --- !u!4 &1452734264
