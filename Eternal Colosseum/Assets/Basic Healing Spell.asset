@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Basic Healing Spell
   m_EditorClassIdentifier: Assembly-CSharp::HealingSpellData
   SpellName: Basic Healing Spell
+  AnimatorCombatState: 3
+  AnimatorSpellVariant: 1
   CastAnimation: {fileID: -5566208886993524023, guid: ea7eef3b76bc80748b0abc3eb2324c69, type: 3}
-  ManaCost: 20
+  ManaCost: 0
   HealAmount: 25
