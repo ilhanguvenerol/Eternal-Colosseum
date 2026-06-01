@@ -13,11 +13,12 @@ public class PlayerMana : MonoBehaviour
     private float currentMana = 0f;
 
     public float CurrentMana => currentMana;
-    public float MaxMana     => maxMana;
+    public float MaxMana => maxMana;
 
     private void Awake()
     {
-        currentMana = maxMana;
+        currentMana = 0f; // Starts empty for progression gameplay
+        onManaChanged?.Invoke(currentMana);
     }
 
     public void GainMana(float amount)
@@ -39,19 +40,12 @@ public class PlayerMana : MonoBehaviour
 
     public void UseMana(float amount)
     {
-        if (!HasEnoughMana(amount))
-        {
-            Debug.Log("[Mana] Yeterli mana yok!");
-            return;
-        }
+        if (!HasEnoughMana(amount)) return;
 
         currentMana = Mathf.Clamp(currentMana - amount, 0f, maxMana);
         Debug.Log($"[Mana] -{amount} kullanıldı  |  Mana: {currentMana}/{maxMana}");
         onManaChanged?.Invoke(currentMana);
     }
 
-    public bool HasEnoughMana(float amount)
-    {
-        return currentMana >= amount;
-    }
+    public bool HasEnoughMana(float amount) => currentMana >= amount;
 }
