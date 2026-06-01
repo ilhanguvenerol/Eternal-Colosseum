@@ -75,18 +75,13 @@ public class PlayerController : MonoBehaviour
     // ─────────────────────────────────────────
     //  Unity Lifecycle
     // ─────────────────────────────────────────
-
-
-    private void Awake()
-    {
-        Controller = GetComponent<CharacterController>();
-        Animator = GetComponent<PlayerAnimator>();
-        MainCamera = Camera.main;
-
-    }
     
     private void Start()
     {
+
+        Controller = GetComponent<CharacterController>();
+        Animator = GetComponent<PlayerAnimator>();
+        MainCamera = Camera.main;
 
         // Build input
         _input = new PlayerInputActions();

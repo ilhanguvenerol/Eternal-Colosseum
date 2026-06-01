@@ -53,7 +53,22 @@ public class PlayerCombatState : MonoBehaviour
     public void EquipSpell(SpellData spell)
     {
         _equippedSpell = spell;
-        _player.Animator.EquipSpell(spell);
+
+        // Fallback reference grabber to prevent frame-one race conditions
+        PlayerAnimator animator = (_player != null) ? _player.Animator : null;
+        if (animator == null)
+        {
+            animator = GetComponent<PlayerAnimator>();
+        }
+
+        if (animator != null)
+        {
+            animator.EquipSpell(spell);
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerCombatState] PlayerAnimator not ready yet for spell assignment.");
+        }
     }
 
     public SpellData EquippedSpell => _equippedSpell;
