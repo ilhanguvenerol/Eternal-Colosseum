@@ -74,13 +74,13 @@ public class PlayerCombatState : MonoBehaviour
         // ─────────────────────────────────────────────────────────────────────
 
         _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_SWORD);
-
+        AudioManager.Instance.PlayPlayerAttack();
         float totalDamage = Inventory.Instance.equippedWeapon.baseDamage
                           + Inventory.Instance.GetTotalBonusDamage();
 
         PlayerMana playerMana = _player.GetComponent<PlayerMana>();
 
-        Collider[] hits = Physics.OverlapSphere(_player.transform.position, 4f);
+        Collider[] hits = Physics.OverlapSphere(_player.transform.position + new Vector3(1,0,0), 1.5f);
         
         System.Collections.Generic.HashSet<EnemyHealth> damagedEnemies =
             new System.Collections.Generic.HashSet<EnemyHealth>();
@@ -124,7 +124,7 @@ public class PlayerCombatState : MonoBehaviour
         _isParrying = true;
 
         _player.Animator.PlayCombatOneShot(PlayerAnimator.COMBAT_PARRY);
-
+        AudioManager.Instance.PlayPlayerParry();
         // Close the parry window after a short duration
         Invoke(nameof(EndParry), 0.5f);
     }
