@@ -30,7 +30,15 @@ public class GameLoopManager : MonoBehaviour
 
         if (currentLevel >= 16 && currentStage >= 4)
         {
-            victoryUI.ShowVictory();
+            if (victoryUI != null)
+            {
+                victoryUI.ShowVictory();
+            }
+            else
+            {
+                Debug.LogWarning("VictoryUI not assigned.");
+            }
+
             return;
         }
 
