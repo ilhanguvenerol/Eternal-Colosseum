@@ -28,7 +28,6 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log("[GAME LOOP] Wave Complete!");
 
-        // Final encounter cleared -> show victory instead of returning to the shop.
         if (currentLevel >= 16 && currentStage >= 4)
         {
             victoryUI.ShowVictory();
