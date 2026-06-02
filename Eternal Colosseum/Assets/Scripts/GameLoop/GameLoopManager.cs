@@ -92,11 +92,5 @@ public class GameLoopManager : MonoBehaviour
             Debug.Log("[GAME LOOP] Test shop transition");
             LoadShop();
         }
-
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            if (victoryUI != null)
-                victoryUI.ShowVictory();
-        }
     }
 }
