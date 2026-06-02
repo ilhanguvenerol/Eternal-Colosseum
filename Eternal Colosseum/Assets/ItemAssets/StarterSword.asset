@@ -18,7 +18,7 @@ MonoBehaviour:
   weaponPrefab: {fileID: 3722788573022134726, guid: 05de7adf3a1cfd749aee579e33d40378, type: 3}
   weaponType: 0
   handedness: 0
-  baseDamage: 50
+  baseDamage: 10
   attackSpeed: 1
   range: 0
   goldCost: 0
