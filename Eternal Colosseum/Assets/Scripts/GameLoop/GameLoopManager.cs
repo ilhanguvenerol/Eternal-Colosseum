@@ -33,7 +33,10 @@ public class GameLoopManager : MonoBehaviour
         if (Inventory.Instance != null)
         {
             Inventory.Instance.currentGold += goldReward;
-            Debug.Log($"[Gold] Earned {goldReward} gold. Total Gold: {Inventory.Instance.currentGold}");
+
+            Debug.Log(
+                $"[Gold] Earned {goldReward} gold. Total Gold: {Inventory.Instance.currentGold}"
+            );
         }
 
         if (currentLevel >= 4 && currentStage >= 4)
@@ -83,7 +86,7 @@ public class GameLoopManager : MonoBehaviour
         {
             OnWaveCompleted();
         }
-        
+
         if (Input.GetKeyDown(KeyCode.P))
         {
             Debug.Log("[GAME LOOP] Test shop transition");
