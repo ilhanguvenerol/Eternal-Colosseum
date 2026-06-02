@@ -2351,6 +2351,7 @@ GameObject:
   - component: {fileID: 653587203}
   - component: {fileID: 653587202}
   - component: {fileID: 653587204}
+  - component: {fileID: 653587205}
   m_Layer: 0
   m_Name: GameOverCanvas
   m_TagString: Untagged
@@ -2401,6 +2402,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveClearUI
   waveClearPanel: {fileID: 2019773969}
+--- !u!114 &653587205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653587201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 974f6b8ccd3579643b0242369730cbe5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VictoryUI
+  victoryPanel: {fileID: 1936673528}
 --- !u!1 &653944835 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -1550367943973613958, guid: 0d45a138fa6697c43a0462e6b368f4d6, type: 3}
