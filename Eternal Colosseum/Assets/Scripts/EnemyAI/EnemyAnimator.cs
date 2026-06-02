@@ -120,6 +120,7 @@ public class EnemyAnimator : MonoBehaviour
     {
         if (_dead) return;
         _animator.SetTrigger(PunchHash);
+        AudioManager.Instance.PlayEnemyAttack();
     }
 
     /// <summary>
@@ -134,6 +135,7 @@ public class EnemyAnimator : MonoBehaviour
         _animator.ResetTrigger(LooseHash);
         _animator.ResetTrigger(StunnedHash);
         _animator.SetTrigger(HitHash);
+        AudioManager.Instance.PlayEnemyHurt();
     }
 
     public void PlayStunned()
@@ -144,6 +146,7 @@ public class EnemyAnimator : MonoBehaviour
         _animator.ResetTrigger(LooseHash);
         _animator.ResetTrigger(HitHash);
         _animator.SetTrigger(StunnedHash);
+        AudioManager.Instance.PlayEnemyHurt();
     }
 
     /// <summary>Fires death. All further API calls are silently ignored.</summary>
@@ -156,6 +159,7 @@ public class EnemyAnimator : MonoBehaviour
         _animator.ResetTrigger(LooseHash);
         _animator.ResetTrigger(StunnedHash);
         _animator.SetTrigger(DeathHash);
+        AudioManager.Instance.PlayEnemyDeath();
     }
 
     public void PlayDrawBow()

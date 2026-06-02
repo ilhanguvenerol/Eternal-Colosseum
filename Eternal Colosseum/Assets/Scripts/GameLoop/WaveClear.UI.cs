@@ -5,12 +5,19 @@ public class WaveClearUI : MonoBehaviour
 {
     public GameObject waveClearPanel;
 
+    private void Awake()
+    {
+        if (GameLoopManager.Instance != null)
+        {
+            GameLoopManager.Instance.waveClearUI = this;
+        }
+    }
+
     public void ShowWaveClear()
     {
         StartCoroutine(ShowRoutine());
     }
 
-    // Brief transition screen shown before loading the shop scene.
     IEnumerator ShowRoutine()
     {
         waveClearPanel.SetActive(true);

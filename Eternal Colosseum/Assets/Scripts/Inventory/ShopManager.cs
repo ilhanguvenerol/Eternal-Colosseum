@@ -56,7 +56,7 @@ public class ShopManager : MonoBehaviour
     private void Start()
     {
         if(slotBackground1 != null) originalSlotColor = slotBackground1.color;
-
+        AudioManager.Instance.PlayShopMusic();
         if (shopPanel != null)
             shopPanel.SetActive(true);
 

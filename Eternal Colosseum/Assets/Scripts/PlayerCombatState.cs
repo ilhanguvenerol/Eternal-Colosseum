@@ -41,7 +41,40 @@ public class PlayerCombatState : MonoBehaviour
     private void Start()
     {
         if (_startingSpell != null)
-            EquipSpell(_startingSpell);
+            EquipSpell(_startingSpell); //[cite: 9]
+
+        // ── WAVE TRANSITION WEAPON REFERENCE FIX ──
+        if (Inventory.Instance != null)
+        {
+            // 1. Scan this new player's armature hierarchy dynamically to find the active "WeaponSlot" bone
+            Transform[] allTransforms = GetComponentsInChildren<Transform>(true);
+            Transform currentSceneWeaponSlot = null;
+
+            foreach (Transform t in allTransforms)
+            {
+                if (t.name == "WeaponSlot")
+                {
+                    currentSceneWeaponSlot = t;
+                    break;
+                }
+            }
+
+            // 2. Feed the new scene's hand bone back to your persistent inventory manager
+            if (currentSceneWeaponSlot != null)
+            {
+                Inventory.Instance.weaponSlot = currentSceneWeaponSlot;
+
+                // 3. Force the inventory to clear out the default editor grey bar and re-instantiate your textured sword asset
+                if (Inventory.Instance.equippedWeapon != null)
+                {
+                    Inventory.Instance.EquipWeapon(Inventory.Instance.equippedWeapon);
+                }
+            }
+            else
+            {
+                Debug.LogError("[PlayerCombatState] Could not find a child Transform named 'WeaponSlot' on this player model.");
+            }
+        }
     }
 
     private void OnEnable() => _input.Enable();
