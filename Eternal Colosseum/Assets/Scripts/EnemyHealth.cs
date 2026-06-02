@@ -32,6 +32,8 @@ public class EnemyHealth : MonoBehaviour
     private void Awake()
     {
         currentHealth = maxHealth;
+
+        Debug.Log($"{gameObject.name} HP = {maxHealth}");
     }
 
     // ─────────────────────────────────────────
@@ -73,6 +75,15 @@ public class EnemyHealth : MonoBehaviour
 
             if (manager != null)
                 manager.OnEnemyDied(brain);
+        }
+
+        BossBrain boss = GetComponent<BossBrain>();
+
+        if (boss != null)
+        {
+            boss.OnDeath();
+
+            GameLoopManager.Instance.OnWaveCompleted();
         }
 
         // 2. Trigger kill items

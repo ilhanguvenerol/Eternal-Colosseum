@@ -28,7 +28,15 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log("[GAME LOOP] Wave Complete!");
 
-        if (currentLevel >= 16 && currentStage >= 4)
+        int goldReward = 100 + (currentStage * currentLevel);
+
+        if (Inventory.Instance != null)
+        {
+            Inventory.Instance.currentGold += goldReward;
+            Debug.Log($"[Gold] Earned {goldReward} gold. Total Gold: {Inventory.Instance.currentGold}");
+        }
+
+        if (currentLevel >= 4 && currentStage >= 4)
         {
             if (victoryUI != null)
             {
@@ -71,6 +79,11 @@ public class GameLoopManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            OnWaveCompleted();
+        }
+        
         if (Input.GetKeyDown(KeyCode.P))
         {
             Debug.Log("[GAME LOOP] Test shop transition");
