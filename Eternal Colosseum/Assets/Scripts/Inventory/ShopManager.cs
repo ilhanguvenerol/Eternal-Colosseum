@@ -90,13 +90,7 @@ public class ShopManager : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
         {
-            inventoryCanvas.SetActive(true);
-            bool isOpen = shopPanel.activeSelf;
-            shopPanel.SetActive(!isOpen);
-            // Hide inventory window when shop opens
-            GameObject invWindow = shopPanel.transform.parent.Find("InventoryWindow")?.gameObject;
-            if (invWindow != null) invWindow.SetActive(false);
-            Time.timeScale = isOpen ? 1f : 0f;
+            ToggleInventory();
         }
 
         if (Keyboard.current != null && Keyboard.current.digit1Key.wasPressedThisFrame)
@@ -107,6 +101,29 @@ public class ShopManager : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.digit3Key.wasPressedThisFrame)
             BuyItem(2);
+    }
+
+    private void ToggleInventory()
+    {
+        bool isOpen = shopPanel.activeSelf;
+        GameObject invWindow = shopPanel.transform.parent.Find("InventoryWindow")?.gameObject;
+
+        if (isOpen)
+        {
+            inventoryCanvas.SetActive(true);
+            shopPanel.SetActive(!isOpen);
+            // Hide inventory window when shop opens
+            if (invWindow != null) invWindow.SetActive(true);
+        }
+        if (!isOpen) 
+        {
+            inventoryCanvas.SetActive(false);
+            shopPanel.SetActive(!isOpen);
+            // Hide inventory window when shop opens
+            if (invWindow != null) invWindow.SetActive(false);
+        }
+        //Time.timeScale = isOpen ? 1f : 0f;
+        //only visible in shop, so no need to worry about time scale, i'm leaving this for here so the change is visible
     }
 
     private ItemRarity RollRarity()
